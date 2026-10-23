@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheese Learning</title>
+<link rel="icon" href="cheese_icon.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<style>
+:root{--green:#16803c;--red:#d92d20;--ink:#202124;--muted:#667085;--line:#e5e7eb;--panel:#f8fafc;--amber:#a15c00}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Segoe UI,Tahoma,sans-serif;color:var(--ink);background:#fff;display:flex;align-items:center;justify-content:center;padding:100px 20px 30px}
+.toolbar{position:fixed;top:16px;left:18px;right:18px;display:flex;align-items:center;gap:10px;z-index:10;flex-wrap:wrap}
+.icon-btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;cursor:pointer;font-size:1rem}
+.icon-btn:hover{background:#f3f4f6}
+#file-upload{display:none}
+.status-pill{margin-left:auto;border-radius:999px;padding:7px 12px;background:#eef2f6;font-size:.88rem;color:#344054}
+.status-pill.paused{background:#fff1d6;color:#854d0e}
+.main-container{width:min(100%,1000px);text-align:center}
+.course-name{font-size:.9rem;color:var(--muted);margin-bottom:10px}
+.question{font-size:clamp(1.25rem,3vw,1.8rem);font-weight:700;margin:18px auto 28px;white-space:pre-wrap;overflow-wrap:anywhere}
+.typing-container{font-size:clamp(1.7rem,5vw,3.4rem);font-weight:700;cursor:text;letter-spacing:clamp(2px,1vw,8px);display:flex;flex-wrap:wrap;justify-content:center;gap:4px;padding:16px 8px;min-height:90px}
+.char{position:relative;min-width:clamp(18px,3.6vw,40px);text-align:center;white-space:pre}
+.char.correct{color:#16803c}
+.char.incorrect{color:var(--red);background:#fff0ef;border-radius:4px}
+.char.pending{color:transparent;border-bottom:3px solid #cbd5e1}
+.char.pending::after{content:attr(data-char);position:absolute;left:50%;transform:translateX(-50%);color:transparent}
+.typing-container:hover .char.pending::after{color:#e5e7eb}
+#hidden-input{position:fixed;left:-10000px;top:0;opacity:0;width:1px;height:1px}
+.progress-wrap{max-width:760px;margin:0 auto 22px;text-align:left}
+.progress-meta{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:.9rem;margin-bottom:8px}
+.progress-track{height:7px;background:#e9edf2;border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;width:0;background:var(--green);transition:width .15s}
+.live-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;max-width:760px;margin:22px auto}
+.metric{border:1px solid var(--line);border-radius:12px;padding:13px 10px;text-align:left}
+.metric-label{font-size:.78rem;color:var(--muted);margin-bottom:6px}
+.metric-value{font-size:1.35rem;font-weight:700}
+.metric-note{font-size:.75rem;color:var(--muted);margin-top:4px}
+.session-stats{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.stat{background:var(--panel);border-radius:12px;padding:12px;text-align:left}
+.stat-label{font-size:.78rem;color:var(--muted)}
+.stat-value{font-weight:700;font-size:1.25rem;margin-top:5px}
+.hint{color:var(--muted);font-size:.88rem;margin:20px auto 0;max-width:700px;line-height:1.5}
+#completion-panel{display:none;max-width:760px;margin:20px auto;text-align:left;border:1px solid var(--line);border-radius:14px;padding:18px}
+#completion-panel h2{margin:0 0 12px}
+.summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.summary-card{background:var(--panel);border-radius:10px;padding:12px}
+.summary-card strong{display:block;font-size:1.3rem;margin-top:5px}
+.modal-overlay{display:none;position:fixed;inset:0;background:#0008;z-index:100;align-items:center;justify-content:center;padding:18px}
+.modal-content{background:#fff;padding:26px;border-radius:14px;width:min(100%,420px);box-shadow:0 10px 35px #0002}
+.modal-content h2{margin-top:0;text-align:center}
+.form-group{margin:15px 0}
+.form-group label{display:block;font-weight:600;margin-bottom:6px}
+.form-group select,.form-group input{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font-size:1rem}
+.btn-start{width:100%;padding:12px;background:#111;color:white;border:0;border-radius:9px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:10px}
+.small-note{font-size:.82rem;color:var(--muted);line-height:1.5}
+@media(max-width:620px){body{padding:105px 12px 24px}.toolbar{left:10px;right:10px;top:10px}.icon-btn{padding:8px 9px}.status-pill{margin-left:0}.live-grid,.session-stats,.summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.metric-value{font-size:1.15rem}.question{margin-bottom:15px}}
+
+/* Cheese Learning navigation and extended interface */
+body{display:block;padding:96px 18px 28px;background:#fcfdfb}.main-container{margin:26px auto}.toolbar{background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px;box-shadow:0 2px 14px #1018280d;top:10px;left:max(12px,calc((100vw - 1180px)/2));right:max(12px,calc((100vw - 1180px)/2))}
+.nav-btn{font-weight:650}.nav-btn.selected{background:#e9f9ef;border-color:#9ad5aa;color:#126d31}
+.page{max-width:1100px;margin:20px auto}.page[hidden]{display:none!important}.secondary{color:#667085}.sheet{border:1px solid #e5e7eb;background:#fff;border-radius:16px;padding:20px;margin:14px 0}.wide{width:100%}.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.lesson-row{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #edf0ee;padding:14px 2px;gap:12px}.lesson-row:last-child{border:0}.lesson-row button{cursor:pointer}.stack{display:grid;gap:10px}.auth-field{width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:8px;margin:4px 0 12px}.bar{height:9px;display:flex;overflow:hidden;background:#eaecf0;border-radius:8px;min-width:145px}.bar span{height:100%}.lvl-A{background:#178a45}.lvl-B{background:#86c95c}.lvl-C{background:#ffca50}.lvl-D{background:#e77864}.extra-info{color:#667085;font-size:clamp(.95rem,2vw,1.15rem);min-height:20px}.details-toggle{background:#e9f9ed;color:#16803c;border:0;border-radius:50%;padding:10px 15px;cursor:pointer;font-size:1.25rem}.details-panel{margin:15px auto;max-width:780px;transition:.2s}.details-panel[hidden]{display:none}.details-panel .session-stats{max-width:none}.view-muted{opacity:.35}.modal-content{max-height:90vh;overflow:auto}.notice{white-space:pre-wrap;color:#667085;font-size:.85rem}.auth-inline{margin-left:auto;font-size:.85rem}.compact{font-size:.9rem}.danger{color:#b42318}.course-name{font-weight:700}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #8adeab;outline-offset:2px}@media(max-width:720px){.toolbar{position:static;margin:-80px 0 20px}.main-container{margin:10px auto}.page{margin:10px auto}.auth-inline{margin-left:0}.lesson-row{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <button class="icon-btn nav-btn selected" data-page="typing" onclick="switchPage('typing')">⌨️ Typing</button>
+  <button class="icon-btn nav-btn" data-page="menu" onclick="switchPage('menu')">🧀 Your Cheese Menu</button>
+  <button class="icon-btn nav-btn" data-page="dashboard" onclick="switchPage('dashboard')">📈 Dashboard</button>
+  <label for="file-upload" class="icon-btn" title="Nhập file Excel">📁 Nhập file</label>
+  <input type="file" id="file-upload" accept=".xlsx,.xls,.csv">
+  <button class="icon-btn" title="Xuất kết quả Excel" onclick="exportExcel()">💾 Xuất Excel</button>
+  <button class="icon-btn" title="Cài đặt" onclick="openSettings()">⚙️ Cài đặt</button>
+  <button class="icon-btn" title="Lưu tiến trình" onclick="saveProgress(true)">⏸️ Lưu tiến trình</button>
+  <span id="status-pill" class="status-pill">Chưa bắt đầu</span>
+  <button id="account-button" class="icon-btn" onclick="openAccount()">👤 Khách / Đăng nhập</button>
+</div>
+
+<main class="main-container page" id="app-area">
+  <div class="course-name" id="course-name">Chưa có bộ từ vựng</div>
+  <div class="progress-wrap">
+    <div class="progress-meta"><span id="progress-text">Tiến độ: 0 / 0 từ</span><span id="accuracy-text">Đúng ngay lần đầu: —</span></div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+  <div class="question" id="question-text">Tải file Excel để bắt đầu...</div>
+  <div class="extra-info" id="extra-info"></div>
+  <div class="typing-container" id="display-area" aria-label="Vùng nhập từ"></div>
+  <input type="text" id="hidden-input" autocomplete="off" autocapitalize="off" spellcheck="false">
+  <div class="live-grid">
+    <div class="metric"><div class="metric-label">Thời gian hoạt động</div><div class="metric-value" id="active-time">0,0 giây</div><div class="metric-note">Không tính lúc tạm dừng</div></div>
+    <div class="metric"><div class="metric-label">Lượt nhập sai</div><div class="metric-value" id="error-count">0</div><div class="metric-note">Từng ký tự sai đã nhập</div></div>
+    <div class="metric"><div class="metric-label">Lần sửa</div><div class="metric-value" id="correction-count">0</div><div class="metric-note">Xóa khi đã có lỗi</div></div>
+    <div class="metric"><div class="metric-label">Điểm tạm tính</div><div class="metric-value" id="live-score">—</div><div class="metric-note" id="live-level">Chưa hoàn thành</div></div>
+  </div>
+  <button class="details-toggle" onclick="toggleDetails()" aria-label="Xem chi tiết phiên" aria-expanded="false" id="details-toggle">⌃</button>
+  <div class="details-panel" id="details-panel" hidden>
+  <p class="secondary">Thống kê phiên học (chỉ tính các từ đã hoàn thành)</p>
+  <div class="session-stats">
+    <div class="stat"><div class="stat-label">Đã hoàn thành</div><div class="stat-value" id="completed-count">0</div></div>
+    <div class="stat"><div class="stat-label">Đúng ngay lần đầu</div><div class="stat-value" id="first-try-count">0</div></div>
+    <div class="stat"><div class="stat-label">Nhóm C + D</div><div class="stat-value" id="weak-count">0</div></div>
+    <div class="stat"><div class="stat-label">Điểm TB phiên</div><div class="stat-value" id="average-score">—</div></div>
+  </div>
+  </div>
+  <p class="hint" id="hint-text">Nhập từ bằng bàn phím. Khi chuyển tab hoặc cửa sổ mất tiêu điểm, đồng hồ sẽ dừng. Khi quay lại, nhấn phím để tiếp tục. Ctrl + J để nghe phát âm.</p>
+  <section id="completion-panel">
+    <h2>🎉 Hoàn thành bài học</h2>
+    <div class="summary-grid">
+      <div class="summary-card">Đã hoàn thành<strong id="sum-completed">0</strong></div>
+      <div class="summary-card">Đúng ngay lần đầu<strong id="sum-first">0%</strong></div>
+      <div class="summary-card">Điểm trung bình<strong id="sum-score">—</strong></div>
+      <div class="summary-card">Cần ôn (C + D)<strong id="sum-weak">0</strong></div>
+    </div>
+    <p class="small-note">Xuất Excel để tải hai sheet: Word Results (chi tiết từng từ) và Summary (thống kê phiên). Các từ chưa làm được đánh dấu Unanswered và không bị tính vào điểm trung bình.</p>
+  </section>
+</main>
+<section class="page" id="menu-page" hidden><div class="sheet"><h2>🧀 Your Cheese Menu</h2><p class="secondary">Mỗi bài học có nhiều phiên, không ghi đè lịch sử. Chế độ Khách chỉ lưu một bài hiện tại.</p><div id="course-list"></div></div><div class="sheet" id="course-detail" hidden></div></section>
+<section class="page" id="dashboard-page" hidden><div class="sheet"><h2>📈 Dashboard</h2><p class="secondary">Tổng quan các bài học của tài khoản.</p><div id="dashboard-body"></div></div></section>
+<div class="modal-overlay" id="account-modal"><div class="modal-content"><h2>👤 Tài khoản Cheese</h2><p id="account-status" class="secondary"></p><label>Email<input class="auth-field" id="auth-email" type="email" autocomplete="email"></label><label>Mật khẩu<input class="auth-field" id="auth-password" type="password" autocomplete="current-password" minlength="6"></label><div class="actions"><button class="icon-btn" onclick="login()">Đăng nhập</button><button class="icon-btn" onclick="register()">Đăng ký</button><button class="icon-btn" onclick="logout()">Đăng xuất</button><button class="icon-btn" onclick="closeAccount()">Đóng</button></div><p class="notice" id="auth-notice">Không nhập service_role key vào trình duyệt. Đăng ký có thể cần xác nhận email tùy cài đặt Supabase.</p></div></div>
+<div class="modal-overlay" id="config-modal">
+  <div class="modal-content">
+    <h2>⚙️ Cài đặt bài học</h2>
+    <div class="form-group"><label for="course-title-input">Tên bộ từ vựng</label><input id="course-title-input" type="text" placeholder="Ví dụ: 600 TOEIC Collocation"></div>
+    <div class="form-group"><label for="col-q-select">Chọn cột CÂU HỎI</label><select id="col-q-select"></select></div>
+    <div class="form-group"><label for="col-a-select">Chọn cột TRẢ LỜI</label><select id="col-a-select"></select></div>
+    <div class="form-group"><label for="col-extra-select">Cột THÔNG TIN THÊM (tùy chọn)</label><select id="col-extra-select"><option value="-1">Không hiển thị</option></select></div>
+    <div class="form-group"><label><input type="checkbox" id="show-question" checked> Hiện câu hỏi</label></div>
+    <div class="form-group"><label><input type="checkbox" id="show-extra" checked> Hiện thông tin thêm</label></div>
+    <div class="form-group"><label for="tts-lang-select">Ngôn ngữ phát âm</label><select id="tts-lang-select"><option value="en-US">Tiếng Anh (Mỹ)</option><option value="en-GB">Tiếng Anh (Anh)</option><option value="zh-CN">Tiếng Trung (Giản thể)</option><option value="zh-TW">Tiếng Trung (Phồn thể)</option><option value="vi-VN">Tiếng Việt</option></select></div>
+    <p class="small-note">Thang điểm: 0 lỗi = 100; 1–3 = 80; 4–5 = 60; 6–9 = 40; từ 10 lỗi = 0. Từ chưa hoàn thành không tính điểm.</p>
+    <p class="small-note" id="import-notice">Mỗi lượt nhập tạo bài học mới ở chế độ Cá nhân. Không gộp theo tên file.</p>
+    <button class="btn-start" onclick="startTest()">BẮT ĐẦU KIỂM TRA</button>
+  </div>
+</div>
+
+<script>
+const soundCorrect = new Audio('tick.mp3');
+const soundWrong = new Audio('beep.mp3');
+soundCorrect.volume = 0.45; soundWrong.volume = 0.35;
+
+let globalRawData = [];
+let testData = [];
+let currentIndex = 0;
+let targetWord = '';
+let ttsLang = 'en-US';
+let courseName = '';
+let active = false;
+let waitingForResumeKey = false;
+let wordStarted = false;
+let wordStartMs = 0;
+let activeMsCurrent = 0;
+let lastTypedText = '';
+let errorCountCurrent = 0;
+let correctionCountCurrent = 0;
+let wrongPositionsCurrent = new Set();
+let sessionCompleted = false;
+let saveTimer = null;
+let courseId = null, sessionId = null, cloudRevision = 0, syncBusy = false, syncRequested = false;
+let colExtra=-1, showQuestion=true, showExtra=true;
+let cloudClient=null, cloudUser=null, suspendCloudSync=false;
+let lastActivityMs=0;
+
+const $ = id => document.getElementById(id);
+const displayArea = $('display-area');
+const hiddenInput = $('hidden-input');
+const questionText = $('question-text');
+const configModal = $('config-modal');
+const statusPill = $('status-pill');
+
+function storageKey(){ return 'cheese_guest_progress_v2'; }
+function now(){ return performance.now(); }
+function elapsedActiveMs(){ return active ? activeMsCurrent + (now() - wordStartMs) : activeMsCurrent; }
+function formatSeconds(ms){ return (ms/1000).toLocaleString('vi-VN',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' giây'; }
+
+function setStatus(text, paused=false){
+  statusPill.textContent = text;
+  statusPill.classList.toggle('paused', paused);
+}
+function startClock(){
+  if (active || currentIndex >= testData.length || sessionCompleted) return;
+  active = true; waitingForResumeKey = false; wordStartMs = now();lastActivityMs=wordStartMs;
+  setStatus('Đang học');
+  updateLiveMetrics();
+}
+function pauseClock(reason='Đã tạm dừng'){
+  if (active){ activeMsCurrent += now() - wordStartMs; active = false; }
+  if (testData.length && currentIndex < testData.length && !sessionCompleted) waitingForResumeKey = true;
+  setStatus(reason, true);
+  updateLiveMetrics();
+  saveProgress(false);
+}
+function resumeOnKey(e){
+  if (!waitingForResumeKey || sessionCompleted || currentIndex >= testData.length) return;
+  if (configModal.style.display === 'flex') return;
+  // Phím kích hoạt đồng thời được dùng để nhập, nếu là ký tự có thể gõ.
+  startClock();
+  if (e.target !== hiddenInput) {
+    hiddenInput.focus({preventScroll:true});
+    if (e.key === 'Backspace') {
+      if (hiddenInput.value.length) {
+        hiddenInput.value = hiddenInput.value.slice(0,-1);
+        hiddenInput.dispatchEvent(new Event('input',{bubbles:true}));
+      }
+      e.preventDefault();
+    } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      hiddenInput.value += e.key;
+      hiddenInput.dispatchEvent(new Event('input',{bubbles:true}));
+      e.preventDefault();
+    }
+  }
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) pauseClock('Tạm dừng — đã rời tab');
+  else if (testData.length && currentIndex < testData.length && !sessionCompleted) {
+    active = false; waitingForResumeKey = true; setStatus('Quay lại — nhấn phím để tiếp tục', true);
+  }
+});
+window.addEventListener('blur', () => pauseClock('Tạm dừng — cửa sổ mất tiêu điểm'));
+window.addEventListener('focus', () => {
+  if (testData.length && currentIndex < testData.length && !sessionCompleted) {
+    active = false; waitingForResumeKey = true; setStatus('Quay lại — nhấn phím để tiếp tục', true);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key.toLowerCase() === 'j') {
+    e.preventDefault(); playPronunciation(); return;
+  }
+  if (waitingForResumeKey) resumeOnKey(e);
+});
+document.addEventListener('keydown', e => {
+  if (e.target !== hiddenInput && configModal.style.display !== 'flex' && testData.length && !sessionCompleted) {
+    if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) hiddenInput.focus({preventScroll:true});
+  }
+});
+
+window.addEventListener('beforeunload', () => saveProgress(false));
+document.addEventListener('visibilitychange', () => { if (document.hidden) saveProgress(false); });
+
+$('file-upload').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = event => {
+    try {
+      const bytes = new Uint8Array(event.target.result);
+      const workbook = XLSX.read(bytes, {type:'array'});
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      globalRawData = XLSX.utils.sheet_to_json(worksheet,{header:1,defval:''});
+      if (globalRawData.length < 2) { alert('File Excel không có đủ dữ liệu hợp lệ.'); return; }
+      courseName = file.name.replace(/\.(xlsx|xls|csv)$/i,'');
+      $('course-title-input').value = courseName;
+      populateColumnSelects(globalRawData[0]);
+      $('completion-panel').style.display = 'none';
+      configModal.style.display = 'flex';
+    } catch(err) { alert('Không đọc được file. Hãy kiểm tra định dạng Excel.'); console.error(err); }
+  };
+  reader.readAsArrayBuffer(file);
+  e.target.value = '';
+});
+
+function populateColumnSelects(headers){
+  const q = $('col-q-select'), a = $('col-a-select'), x=$('col-extra-select');
+  q.innerHTML=''; a.innerHTML='';x.innerHTML='';x.add(new Option('Không hiển thị',-1));
+  headers.forEach((header,index) => {
+    const label = String(header || `Cột ${index+1}`);
+    q.add(new Option(label,index)); a.add(new Option(label,index));x.add(new Option(label,index));
+  });
+  if(headers.length > 1) a.selectedIndex = 1;
+}
+function openSettings(){
+  if(globalRawData.length) configModal.style.display='flex';
+  else alert('Vui lòng tải file Excel lên trước.');
+}
+function startTest(){
+  const qIdx = Number.parseInt($('col-q-select').value,10);
+  const aIdx = Number.parseInt($('col-a-select').value,10);
+  if(qIdx === aIdx){ if(!confirm('Bạn đang chọn cùng một cột cho câu hỏi và đáp án. Vẫn tiếp tục?')) return; }
+  ttsLang = $('tts-lang-select').value;
+  colExtra=Number($('col-extra-select').value);showQuestion=$('show-question').checked;showExtra=$('show-extra').checked;
+  courseName = $('course-title-input').value.trim() || 'Vocabulary';
+  testData = [];
+  for(let i=1;i<globalRawData.length;i++){
+    const row=globalRawData[i];
+    const q= row[qIdx] === undefined ? '' : String(row[qIdx]).trim();
+    const a= row[aIdx] === undefined ? '' : String(row[aIdx]).trim();
+    if(q && a){
+      testData.push({
+        Q:q,A:a,Extra:colExtra>=0?String(row[colExtra]??'').trim():'',SourceRow:i+1,Status:'Unanswered',Score:null,Level:'Unanswered',
+        FirstTryCorrect:null,ErrorCount:0,CorrectionCount:0,ActiveTimeSeconds:null,
+        WrongPositions:0,CompletedAt:''
+      });
+    }
+  }
+  if(!testData.length){alert('Không có dòng nào có đủ câu hỏi và đáp án.');return;}
+  currentIndex=0; sessionCompleted=false; active=false; waitingForResumeKey=false;
+  courseId=null;sessionId=null;cloudRevision=0;
+  configModal.style.display='none';
+  resetCurrentWord(); loadQuestion(); updateSessionStats(); saveProgress(false);
+  hiddenInput.focus({preventScroll:true});
+  if(cloudUser) createCloudCourseAndSession();
+}
+function playPronunciation(){
+  if(!targetWord || !('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(targetWord);
+  utterance.lang=ttsLang; window.speechSynthesis.speak(utterance);
+}
+function resetCurrentWord(){
+  active=false; waitingForResumeKey=false; wordStarted=false; wordStartMs=0; activeMsCurrent=0;
+  lastTypedText=''; errorCountCurrent=0; correctionCountCurrent=0; wrongPositionsCurrent=new Set();
+  hiddenInput.value='';
+  $('error-count').textContent='0'; $('correction-count').textContent='0';
+  $('active-time').textContent='0,0 giây'; $('live-score').textContent='—'; $('live-level').textContent='Chưa hoàn thành';
+}
+function loadQuestion(){
+  if(currentIndex>=testData.length){finishSession();return;}
+  const item=testData[currentIndex];
+  targetWord=item.A; questionText.textContent=showQuestion?item.Q:'';
+  $('extra-info').textContent=showExtra?(item.Extra||''):'';
+  $('course-name').textContent=courseName;
+  $('completion-panel').style.display='none';
+  resetCurrentWord();
+  displayArea.innerHTML='';
+  for(let i=0;i<targetWord.length;i++){
+    const span=document.createElement('span');
+    span.dataset.char=targetWord[i];
+    if(targetWord[i]===' '){span.innerHTML='&nbsp;';span.className='char pending';}
+    else {span.textContent='_';span.className='char pending';}
+    displayArea.appendChild(span);
+  }
+  playPronunciation();
+  if(document.hidden || !document.hasFocus()){
+    waitingForResumeKey=true;setStatus('Nhấn phím để bắt đầu',true);
+  }else{
+    waitingForResumeKey=true;setStatus('Nhấn phím để bắt đầu',true);
+  }
+  updateProgress();updateSessionStats();updateLiveMetrics();
+}
+function normalizeChar(ch){return ch.toLocaleLowerCase();}
+function countWrongPositions(text){
+  let count=0;
+  for(let i=0;i<Math.min(text.length,targetWord.length);i++){
+    if(normalizeChar(text[i])!==normalizeChar(targetWord[i])) count++;
+  }
+  return count;
+}
+function updateDisplay(text){
+  const spans=displayArea.querySelectorAll('span');
+  for(let i=0;i<targetWord.length;i++){
+    if(i<text.length){
+      if(normalizeChar(text[i])===normalizeChar(targetWord[i])){
+        spans[i].textContent=targetWord[i];spans[i].className='char correct';
+      }else{
+        spans[i].textContent=text[i]===' '?'_':text[i];spans[i].className='char incorrect';
+      }
+    }else{
+      spans[i].textContent=targetWord[i]===' '?'\\u00a0':'_';spans[i].className='char pending';
+    }
+  }
+}
+hiddenInput.addEventListener('beforeinput', () => { if(!active && !waitingForResumeKey) startClock(); });
+hiddenInput.addEventListener('input', e => {
+  if(currentIndex>=testData.length || sessionCompleted) return;
+  if(waitingForResumeKey) startClock();
+  if(!active) startClock();
+  lastActivityMs=now();
+  const text=hiddenInput.value;
+  const inputType=e.inputType || '';
+  // Phát hiện phần văn bản mới được chèn, tránh đếm lại các ký tự đã nhập ở trước.
+  let prefix=0;
+  while(prefix<lastTypedText.length && prefix<text.length && lastTypedText[prefix]===text[prefix]) prefix++;
+  let suffix=0;
+  while(suffix<lastTypedText.length-prefix && suffix<text.length-prefix &&
+        lastTypedText[lastTypedText.length-1-suffix]===text[text.length-1-suffix]) suffix++;
+  const inserted=text.slice(prefix,text.length-suffix);
+  if(inserted.length){
+    for(let j=0;j<inserted.length;j++){
+      const pos=prefix+j;
+      if(pos>=targetWord.length || normalizeChar(inserted[j])!==normalizeChar(targetWord[pos])){
+        errorCountCurrent++;wrongPositionsCurrent.add(pos);
+        soundWrong.currentTime=0;soundWrong.play().catch(()=>{});
+      }
+    }
+  }
+  if(inputType.startsWith('delete') && lastTypedText.length>text.length) correctionCountCurrent++;
+  else if(lastTypedText.length>prefix+suffix && inserted.length) correctionCountCurrent++;
+  // Cap input at answer length; still record the attempted input above.
+  if(text.length>targetWord.length){
+    hiddenInput.value=text.slice(0,targetWord.length);
+  }
+  lastTypedText=hiddenInput.value;
+  updateDisplay(lastTypedText);
+  $('error-count').textContent=String(errorCountCurrent);
+  $('correction-count').textContent=String(correctionCountCurrent);
+  const score=scoreForErrors(errorCountCurrent);
+  $('live-score').textContent=lastTypedText.length===targetWord.length && countWrongPositions(lastTypedText)===0 ? score : '—';
+  $('live-level').textContent=lastTypedText.length===targetWord.length && countWrongPositions(lastTypedText)===0 ? levelForScore(score) : 'Chưa hoàn thành';
+  updateLiveMetrics();
+  if(lastTypedText.length===targetWord.length && countWrongPositions(lastTypedText)===0) completeCurrentWord();
+  else saveProgress(false);
+});
+function scoreForErrors(errors){
+  if(errors===0)return 100;
+  if(errors<=3)return 80;
+  if(errors<=5)return 60;
+  if(errors<=9)return 40;
+  return 0;
+}
+function levelForScore(score){
+  if(score>=90)return 'A — Đã thuộc tốt';
+  if(score>=70)return 'B — Khá vững';
+  if(score>=40)return 'C — Chưa vững';
+  return 'D — Cần học lại';
+}
+function completeCurrentWord(){
+  if(sessionCompleted || currentIndex>=testData.length) return;
+  if(active) activeMsCurrent += now()-wordStartMs;
+  active=false;waitingForResumeKey=false;
+  const item=testData[currentIndex];
+  const firstTry=errorCountCurrent===0 && correctionCountCurrent===0;
+  const score=scoreForErrors(errorCountCurrent);
+  item.Status='Completed';item.Score=score;item.Level=levelForScore(score);
+  item.FirstTryCorrect=firstTry?'Yes':'No';
+  item.ErrorCount=errorCountCurrent;item.CorrectionCount=correctionCountCurrent;
+  item.ActiveTimeSeconds=Number((activeMsCurrent/1000).toFixed(2));
+  item.WrongPositions=wrongPositionsCurrent.size;
+  item.CompletedAt=new Date().toISOString();
+  soundCorrect.currentTime=0;soundCorrect.play().catch(()=>{});
+  currentIndex++;
+  saveProgress(false);updateSessionStats();updateProgress();
+  setTimeout(loadQuestion,70);
+}
+function updateProgress(){
+  const total=testData.length, done=testData.filter(x=>x.Status==='Completed').length;
+  $('progress-text').textContent=`Tiến độ: ${Math.min(currentIndex,total)} / ${total} từ`;
+  $('progress-fill').style.width=(total?Math.min(currentIndex,total)/total*100:0)+'%';
+  const first=testData.filter(x=>x.Status==='Completed'&&x.FirstTryCorrect==='Yes').length;
+  $('accuracy-text').textContent=`Đúng ngay lần đầu: ${done?Math.round(first/done*100)+'%':'—'}`;
+}
+function updateSessionStats(){
+  const completed=testData.filter(x=>x.Status==='Completed');
+  const first=completed.filter(x=>x.FirstTryCorrect==='Yes').length;
+  const weak=completed.filter(x=>x.Score<70).length;
+  const avg=completed.length?Math.round(completed.reduce((s,x)=>s+x.Score,0)/completed.length):null;
+  $('completed-count').textContent=completed.length;
+  $('first-try-count').textContent=first;
+  $('weak-count').textContent=weak;
+  $('average-score').textContent=avg===null?'—':avg;
+}
+function updateLiveMetrics(){
+  if(active && now()-lastActivityMs>15000){
+    activeMsCurrent+=Math.max(0,lastActivityMs-wordStartMs);active=false;waitingForResumeKey=true;
+    setStatus('Tạm dừng — không thao tác 15 giây',true);saveProgress(false);
+  }
+  $('active-time').textContent=formatSeconds(elapsedActiveMs());
+  $('error-count').textContent=errorCountCurrent;
+  $('correction-count').textContent=correctionCountCurrent;
+  if(active) requestAnimationFrame(updateLiveMetrics);
+}
+function finishSession(){
+  sessionCompleted=true;active=false;waitingForResumeKey=false;
+  questionText.textContent='🎉 Hoàn thành bài học!';
+  displayArea.innerHTML='';hiddenInput.blur();
+  setStatus('Đã hoàn thành');
+  $('hint-text').textContent='Bạn có thể xuất Excel để xem chi tiết từng từ và thống kê toàn bộ phiên học.';
+  const done=testData.filter(x=>x.Status==='Completed');
+  const first=done.filter(x=>x.FirstTryCorrect==='Yes').length;
+  const weak=done.filter(x=>x.Score<70).length;
+  const avg=done.length?Math.round(done.reduce((s,x)=>s+x.Score,0)/done.length):null;
+  $('sum-completed').textContent=`${done.length} / ${testData.length}`;
+  $('sum-first').textContent=done.length?Math.round(first/done.length*100)+'%':'—';
+  $('sum-score').textContent=avg===null?'—':avg;
+  $('sum-weak').textContent=weak;
+  $('completion-panel').style.display='block';
+  updateProgress();updateSessionStats();saveProgress(false);
+}
+function saveProgress(showAlert=false){
+  if(!testData.length)return;
+  const payload={
+    version:2,testData,currentIndex,ttsLang,courseName,sessionCompleted,colExtra,showQuestion,showExtra,courseId,sessionId,
+    currentInput:hiddenInput.value,
+    activeMsCurrent:elapsedActiveMs(),
+    errorCountCurrent,correctionCountCurrent,
+    wrongPositionsCurrent:Array.from(wrongPositionsCurrent),
+    savedAt:new Date().toISOString()
+  };
+  try{
+    if(!cloudUser)localStorage.setItem(storageKey(),JSON.stringify(payload));
+    else if(!suspendCloudSync) queueCloudSave(payload);
+    if(showAlert) { setStatus('Đã lưu tiến trình'); alert('Đã lưu tiến trình trên trình duyệt này.'); }
+  }catch(err){if(showAlert)alert('Không thể lưu tiến trình. Có thể bộ dữ liệu quá lớn hoặc bộ nhớ trình duyệt đã đầy.');}
+}
+function restoreProgress(){
+  const raw=localStorage.getItem(storageKey());
+  if(!raw)return;
+  try{
+    const saved=JSON.parse(raw);
+    if(!saved.testData?.length)return;
+    if(!confirm(`Tìm thấy tiến trình "${saved.courseName||'Vocabulary'}" đã lưu. Bạn muốn tiếp tục?`))return;
+    testData=saved.testData;currentIndex=Math.min(saved.currentIndex||0,testData.length);
+    ttsLang=saved.ttsLang||'en-US';courseName=saved.courseName||'Vocabulary';sessionCompleted=!!saved.sessionCompleted;
+    showQuestion=saved.showQuestion!==false;showExtra=saved.showExtra!==false;colExtra=saved.colExtra??-1;
+    $('course-name').textContent=courseName;
+    if(sessionCompleted){finishSession();return;}
+    loadQuestion();
+    if(currentIndex < testData.length && saved.currentInput){
+      activeMsCurrent=Number(saved.activeMsCurrent)||0;
+      errorCountCurrent=Number(saved.errorCountCurrent)||0;
+      correctionCountCurrent=Number(saved.correctionCountCurrent)||0;
+      wrongPositionsCurrent=new Set(saved.wrongPositionsCurrent||[]);
+      hiddenInput.value=saved.currentInput;
+      lastTypedText=saved.currentInput;
+      updateDisplay(lastTypedText);
+      $('error-count').textContent=String(errorCountCurrent);
+      $('correction-count').textContent=String(correctionCountCurrent);
+      updateLiveMetrics();
+      waitingForResumeKey=true;
+      setStatus('Tiến trình đã khôi phục — nhấn phím để tiếp tục',true);
+    }
+  }catch(err){console.error('Không khôi phục được tiến trình:',err);}
+}
+function exportExcel(){
+  if(!testData.length){alert('Chưa có dữ liệu để xuất.');return;}
+  const wb=XLSX.utils.book_new();
+  const rows=[[
+    'STT','CÂU HỎI','ĐÁP ÁN','TRẠNG THÁI','ĐÚNG NGAY LẦN ĐẦU',
+    'SỐ LƯỢT NHẬP SAI','SỐ LẦN SỬA','SỐ VỊ TRÍ SAI','THỜI GIAN HOẠT ĐỘNG (GIÂY)',
+    'ĐIỂM','CẤP ĐỘ','THỜI ĐIỂM HOÀN THÀNH'
+  ]];
+  testData.forEach((item,i)=>rows.push([
+    i+1,item.Q,item.A,item.Status,item.FirstTryCorrect??'',item.ErrorCount??0,
+    item.CorrectionCount??0,item.WrongPositions??0,item.ActiveTimeSeconds??'',
+    item.Score??'',item.Level??'Unanswered',item.CompletedAt??''
+  ]));
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=[{wch:7},{wch:35},{wch:30},{wch:15},{wch:22},{wch:18},{wch:15},{wch:16},{wch:24},{wch:10},{wch:24},{wch:26}];
+  XLSX.utils.book_append_sheet(wb,ws,'Word Results');
+  const done=testData.filter(x=>x.Status==='Completed');
+  const first=done.filter(x=>x.FirstTryCorrect==='Yes').length;
+  const levels={A:0,B:0,C:0,D:0,Unanswered:testData.filter(x=>x.Status!=='Completed').length};
+  done.forEach(x=>{const letter=(x.Level||'').charAt(0);if(levels[letter]!==undefined)levels[letter]++;});
+  const avg=done.length?Number((done.reduce((s,x)=>s+x.Score,0)/done.length).toFixed(2)):'';
+  const avgTime=done.length?Number((done.reduce((s,x)=>s+(x.ActiveTimeSeconds||0),0)/done.length).toFixed(2)):'';
+  const summary=[
+    ['BỘ TỪ VỰNG',courseName],
+    ['THỜI ĐIỂM XUẤT',new Date().toLocaleString('vi-VN')],
+    ['TỔNG SỐ TỪ',testData.length],
+    ['TỶ LỆ HOÀN THÀNH',Number((done.length/testData.length*100).toFixed(2))+'%'],
+    ['ĐÃ HOÀN THÀNH',done.length],
+    ['CHƯA HOÀN THÀNH',levels.Unanswered],
+    ['TỶ LỆ ĐÚNG NGAY LẦN ĐẦU',done.length?Number((first/done.length*100).toFixed(2))+'%':''],
+    ['ĐIỂM TRUNG BÌNH',avg],
+    ['THỜI GIAN HOẠT ĐỘNG TB (GIÂY)',avgTime],
+    ['SỐ TỪ NHÓM A (90–100)',levels.A],
+    ['TỶ LỆ NHÓM A',Number((levels.A/testData.length*100).toFixed(2))+'%'],
+    ['SỐ TỪ NHÓM B (70–89)',levels.B],
+    ['TỶ LỆ NHÓM B',Number((levels.B/testData.length*100).toFixed(2))+'%'],
+    ['SỐ TỪ NHÓM C (40–69)',levels.C],
+    ['TỶ LỆ NHÓM C',Number((levels.C/testData.length*100).toFixed(2))+'%'],
+    ['SỐ TỪ NHÓM D (0–39)',levels.D],
+    ['TỶ LỆ NHÓM D',Number((levels.D/testData.length*100).toFixed(2))+'%'],
+    ['TỶ LỆ TỪ CÓ LỖI',done.length?Number((done.filter(x=>x.ErrorCount>0).length/done.length*100).toFixed(2))+'%':''],
+    [],['TỪ YẾU (D TRƯỚC, C SAU)','Điểm | Câu hỏi | Đáp án'],
+    ...done.filter(x=>x.Score<70).sort((a,b)=>a.Score-b.Score||b.ErrorCount-a.ErrorCount).map(x=>['Ưu tiên '+x.Level.charAt(0),x.Score+' | '+x.Q+' | '+x.A]),
+    ['ƯU TIÊN ÔN TẬP','Nhóm D trước, sau đó C; nhóm B ôn củng cố; nhóm A kiểm tra định kỳ'],
+    [],
+    ['THANG ĐIỂM','100: 0 lỗi; 80: 1–3; 60: 4–5; 40: 6–9; 0: 10+. Từ chưa hoàn thành không tính điểm.'],
+    ['LƯU Ý','Điểm phản ánh khả năng gõ trong phiên này, chưa khẳng định khả năng nhớ dài hạn.']
+  ];
+  const sumWs=XLSX.utils.aoa_to_sheet(summary);
+  sumWs['!cols']=[{wch:36},{wch:100}];
+  XLSX.utils.book_append_sheet(wb,sumWs,'Summary');
+  const safeName=(courseName||'Vocabulary').replace(/[\\/:*?"<>|]+/g,'_');
+  XLSX.writeFile(wb,`Ket_Qua_${safeName}.xlsx`);
+}
+hiddenInput.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){pauseClock('Đã tạm dừng');}
+});
+document.body.addEventListener('click',e=>{
+  if(!configModal.contains(e.target)&&configModal.style.display!=='flex'&&testData.length&&currentIndex<testData.length&&!sessionCompleted&&!waitingForResumeKey){
+    hiddenInput.focus({preventScroll:true});
+  }
+});
+window.addEventListener('load',initializeApp);
+</script>
+<script src="cloud.js"></script>
+</body>
+</html>
