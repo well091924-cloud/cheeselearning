@@ -4,13 +4,11 @@ if(cloudConfigured) cloudClient = window.supabase.createClient(window.CHEESE_CON
 let lastSnapshot=null;
 const notice = (msg) => { $('auth-notice').textContent=msg; };
 const safe = value => String(value??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function switchPage(page){
-  pauseClock('Tạm dừng — chuyển màn hình');
-  $('app-area').hidden=page!=='typing';$('menu-page').hidden=page!=='menu';$('dashboard-page').hidden=page!=='dashboard';
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('selected',b.dataset.page===page));
-  if(page==='menu') renderMenu();if(page==='dashboard')renderDashboard();
-}
-function toggleDetails(){const p=$('details-panel');p.hidden=!p.hidden;$('details-toggle').textContent=p.hidden?'⌃':'⌄';$('details-toggle').setAttribute('aria-expanded',String(!p.hidden));}
+function toggleSidebar(force){const el=$('sidebar');const open=typeof force==='boolean'?force:!el.classList.contains('open');el.classList.toggle('open',open);el.setAttribute('aria-hidden',String(!open));$('sidebar-backdrop').hidden=!open;}
+function switchPage(page){pauseClock('Tạm dừng');toggleSidebar(false);$('app-area').hidden=page!=='typing';$('menu-page').hidden=page!=='menu';$('dashboard-page').hidden=page!=='dashboard';$('app-area').classList.remove('stats-open');$('details-panel').hidden=true;if(page==='menu')renderMenu();if(page==='dashboard')renderDashboard();}
+function toggleDetails(){const panel=$('details-panel');const open=panel.hidden;panel.hidden=!open;$('app-area').classList.toggle('stats-open',open);$('details-toggle').setAttribute('aria-expanded',String(open));if(open)pauseClock('Xem thống kê');else hiddenInput.focus({preventScroll:true});}
+function syncAccountUI(){const logged=!!cloudUser;$('account-button').textContent=logged?(cloudUser.email||'Cá nhân'):'Khách';$('auth-action').textContent=logged?'⇥':'↪';$('auth-action').title=logged?'Đăng xuất':'Đăng nhập';$('auth-action').setAttribute('aria-label',$('auth-action').title);$('auth-action').onclick=logged?logout:openAccount;}
+async function changePassword(){if(!cloudUser){openAccount();return;}const password=prompt('Mật khẩu mới (tối thiểu 8 ký tự):');if(password===null)return;if(password.length<8)return alert('Mật khẩu quá ngắn.');const {error}=await cloudClient.auth.updateUser({password});alert(error?error.message:'Đã đổi mật khẩu.');}
 function openAccount(){ $('account-modal').style.display='flex'; $('account-status').textContent=cloudUser?'Đang đăng nhập: '+cloudUser.email:(cloudConfigured?'Chế độ Khách':'Chế độ Khách — chưa cấu hình Supabase trong config.js'); }
 function closeAccount(){$('account-modal').style.display='none';}
 async function login(){
@@ -19,29 +17,23 @@ async function login(){
   if(error)return notice(error.message);
   notice('Đăng nhập thành công.');closeAccount();await handleAuth(data.user);
 }
-async function register(){
-  if(!cloudClient)return notice('Cần cấu hình Supabase trước.');
-  const {data,error}=await cloudClient.auth.signUp({email:$('auth-email').value.trim(),password:$('auth-password').value});
-  notice(error?error.message:(data.session?'Đăng ký và đăng nhập thành công.':'Đã đăng ký. Kiểm tra email xác minh trước khi đăng nhập.'));
-  if(data.session){closeAccount();await handleAuth(data.user);}
-}
-async function logout(){if(cloudClient){await cloudClient.auth.signOut();}cloudUser=null;courseId=null;sessionId=null;cloudRevision=0;testData=[];currentIndex=0;sessionCompleted=false;resetCurrentWord();$('question-text').textContent='Nhập Excel để bắt đầu...';$('display-area').replaceChildren();$('extra-info').textContent='';$('completion-panel').style.display='none';$('account-button').textContent='👤 Khách / Đăng nhập';closeAccount();switchPage('typing');restoreProgress();}
+async function logout(){if(cloudClient){await cloudClient.auth.signOut();}cloudUser=null;courseId=null;sessionId=null;cloudRevision=0;testData=[];currentIndex=0;sessionCompleted=false;resetCurrentWord();$('question-text').textContent='Nhập Excel để bắt đầu...';$('display-area').replaceChildren();$('extra-info').textContent='';$('completion-panel').style.display='none';syncAccountUI();closeAccount();switchPage('typing');restoreProgress();}
 async function handleAuth(user){
   if(!user)return;
   pauseClock('Chuyển sang chế độ Cá nhân');
   cloudUser=user;courseId=null;sessionId=null;cloudRevision=0;
   testData=[];currentIndex=0;sessionCompleted=false;resetCurrentWord();$('display-area').replaceChildren();
   $('question-text').textContent='Mở Your Cheese Menu hoặc nhập Excel để bắt đầu.';
-  $('account-button').textContent='👤 '+(user.email||'Cá nhân');
+  syncAccountUI();
   setStatus('Cá nhân — đồng bộ đám mây');
   switchPage('menu');
 }
 async function initializeApp(){
-  if(!cloudClient){restoreProgress();return;}
+  if(!cloudClient){restoreProgress();syncAccountUI();return;}
   const {data:{session}}=await cloudClient.auth.getSession();
-  if(session?.user) await handleAuth(session.user);else restoreProgress();
+  if(session?.user) await handleAuth(session.user);else restoreProgress();syncAccountUI();
   cloudClient.auth.onAuthStateChange((ev,session)=>{
-    if(ev==='SIGNED_OUT' && cloudUser){cloudUser=null;$('account-button').textContent='👤 Khách / Đăng nhập';}
+    if(ev==='SIGNED_OUT' && cloudUser){cloudUser=null;syncAccountUI();}
   });
 }
 async function createCloudCourseAndSession(){
@@ -107,39 +99,64 @@ function sessionMetrics(s){
 }
 function progressBar(levels){const total=Object.values(levels).reduce((a,b)=>a+b,0);return `<div class="bar" aria-label="A ${levels.A}; B ${levels.B}; C ${levels.C}; D ${levels.D}">${Object.entries(levels).map(([k,v])=>`<span class="lvl-${k}" style="width:${total?100*v/total:0}%"></span>`).join('')}</div>`;}
 async function renderMenu(){
-  const box=$('course-list');$('course-detail').hidden=true;
-  if(!cloudUser){box.innerHTML=`<p>Khách: chỉ một bài được lưu trong trình duyệt. ${testData.length?safe(courseName)+' — '+currentIndex+'/'+testData.length+' từ':'Chưa có bài học.'}</p>`;return;}
-  box.textContent='Đang tải danh sách...';
-  try{
-    const courses=await cloudCourses();box.replaceChildren();
-    if(!courses.length){box.textContent='Chưa có bài học. Hãy vào Typing để nhập Excel.';return;}
-    for(const course of courses){
-      const sessions=[...course.sessions].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));const latest=sessions[0];const m=latest?sessionMetrics(latest):null;
-      const row=document.createElement('div');row.className='lesson-row';
-      row.innerHTML=`<div><strong>${safe(course.name)}</strong><div class="secondary compact">${course.words.length} từ · ${sessions.length} phiên · ${m?m.done.length+'/'+m.total+' đã làm':'Chưa học'}</div></div>${m?progressBar(m.levels):''}`;
-      const btn=document.createElement('button');btn.className='icon-btn';btn.textContent='Xem chi tiết';btn.onclick=()=>showCourse(course);row.append(btn);box.append(row);
-    }
-  }catch(err){box.textContent='Lỗi tải Cheese Menu: '+err.message;}
+  const box=$('course-list');box.textContent='';
+  if(!cloudUser){const row=document.createElement('div');row.className='lesson-row';row.innerHTML=`<strong>${safe(courseName||'Chưa có bài học')}</strong><div>${testData.length} từ · ${currentIndex}/${testData.length}</div>`;row.onclick=()=>switchPage('typing');box.append(row);return;}
+  try{const courses=await cloudCourses();if(!courses.length){box.textContent='Chưa có bài học';return;}
+    for(const course of courses){const latest=[...course.sessions].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0];const m=latest?sessionMetrics(latest):null;const row=document.createElement('div');row.className='lesson-row';row.tabIndex=0;row.setAttribute('role','button');row.innerHTML=`<strong>${safe(course.name)}</strong><span>${course.words.length} từ · ${course.sessions.length} phiên</span>${m?progressBar(m.levels):''}`;row.onclick=()=>showCourse(course);row.onkeydown=e=>{if(e.key==='Enter')showCourse(course)};box.append(row);}
+  }catch(err){box.textContent='Lỗi tải bài học: '+err.message;}
 }
+let selectedCourse=null, editedRows=null, editChanged=false;
+function closeCourseModal(){$('course-modal').style.display='none';}
 async function showCourse(course){
-  const box=$('course-detail');box.hidden=false;box.replaceChildren();
-  const heading=document.createElement('h3');heading.textContent=course.name;box.append(heading);
-  const sessions=[...course.sessions].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
-  const last=sessions[sessions.length-1];
-  if(last){const m=sessionMetrics(last);const p=document.createElement('p');p.textContent=`Phiên mới nhất: điểm trung bình ${m.avg.toFixed(1)} · ${m.done.length}/${m.total} từ · trung bình ${m.active.toFixed(1)} giây/từ · A ${m.levels.A}, B ${m.levels.B}, C ${m.levels.C}, D ${m.levels.D}`;box.append(p);}
-  const list=document.createElement('div');list.className='stack';box.append(list);
-  for(const s of sessions){const m=sessionMetrics(s);const row=document.createElement('div');row.className='lesson-row';row.innerHTML=`<span>${new Date(s.created_at).toLocaleString('vi-VN')}<br><small>${m.done.length}/${m.total} · Điểm ${m.avg.toFixed(1)} · ${safe(s.status)}</small></span>${progressBar(m.levels)}`;
-    const b=document.createElement('button');b.className='icon-btn';b.textContent='Mở phiên';b.onclick=()=>openCloudSession(course,s);row.append(b);list.append(row);}
-  const newButton=document.createElement('button');newButton.className='icon-btn';newButton.textContent='Học lại (phiên mới)';newButton.onclick=()=>newCloudSession(course);box.append(newButton);
+ selectedCourse=course;$('detail-course-title').textContent=course.name;
+ const body=$('course-modal-body');body.replaceChildren();const sessions=[...course.sessions].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));const latest=sessions[0],m=latest?sessionMetrics(latest):null;
+ const left=document.createElement('div');const metrics=[['Điểm trung bình',m?m.avg.toFixed(1):'—'],['Tổng số từ',course.words.length],['Đã hoàn thành',m?m.done.length:'0'],['Thời gian hoạt động TB (s)',m?m.active.toFixed(1):'—'],...['A','B','C','D'].map(k=>['Nhóm '+k,m?m.levels[k]:0])];left.innerHTML=metrics.map(([a,b])=>`<div class="metric-pair"><span>${safe(a)}</span><strong>${safe(b)}</strong></div>`).join('');
+ const right=document.createElement('div');right.innerHTML='<h3>Lịch sử phiên</h3>';sessions.forEach(sess=>{const sm=sessionMetrics(sess);const r=document.createElement('div');r.className='history-row';r.innerHTML=`<div class="history-title">${new Date(sess.created_at).toLocaleString('vi-VN')} · ${sm.done.length}/${sm.total} · ${sm.avg.toFixed(1)} điểm</div>${progressBar(sm.levels)}`;right.append(r)});if(!sessions.length)right.textContent='Chưa có phiên học';
+ const layout=document.createElement('div');layout.className='course-modal-layout';layout.append(left,right);body.append(layout);const buttons=document.createElement('div');buttons.className='actions modal-actions';
+ const unfinished=sessions.find(x=>x.status==='in_progress' && x.state?.testData?.length);
+ if(unfinished){const b=document.createElement('button');b.className='icon-btn';b.textContent='Tiếp tục học';b.onclick=()=>{closeCourseModal();openCloudSession(course,unfinished)};buttons.append(b);}
+ const start=document.createElement('button');start.className='icon-btn';start.textContent='Bắt đầu phiên học mới';start.onclick=()=>openShuffle(course);buttons.append(start);
+ const edit=document.createElement('button');edit.className='icon-btn';edit.textContent='Chỉnh sửa bài học';edit.onclick=()=>openCourseEdit(course);buttons.append(edit);body.append(buttons);$('course-modal').style.display='flex';
 }
-async function newCloudSession(course){
-  if(!confirm('Tạo phiên học mới từ đầu? Lịch sử cũ vẫn được giữ.'))return;
-  const {data:words,error:we}=await cloudClient.from('words').select('*').eq('course_id',course.id).order('ordinal');if(we)return alert(we.message);
-  const {data:s,error:se}=await cloudClient.from('sessions').insert({course_id:course.id,user_id:cloudUser.id,state:{}}).select('id,revision').single();if(se)return alert(se.message);
-  courseId=course.id;sessionId=s.id;cloudRevision=Number(s.revision);courseName=course.name;
-  const cfg=course.settings||{};ttsLang=cfg.ttsLang||'en-US';showQuestion=cfg.showQuestion!==false;showExtra=cfg.showExtra!==false;colExtra=cfg.colExtra??-1;
-  testData=words.map(w=>({Q:w.question,A:w.answer,Extra:w.extra,Status:'Unanswered',Score:null,Level:'Unanswered',FirstTryCorrect:null,ErrorCount:0,CorrectionCount:0,ActiveTimeSeconds:null,CompletedAt:''}));
-  currentIndex=0;sessionCompleted=false;switchPage('typing');loadQuestion();saveProgress(false);
+function shuffleList(list){const a=[...list];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function openShuffle(course){selectedCourse=course;$('shuffle-modal').style.display='flex';}
+function closeShuffle(){$('shuffle-modal').style.display='none';}
+async function confirmNewSession(){const mode=document.querySelector('input[name="shuffle"]:checked').value;const c=selectedCourse;const latest=[...c.sessions].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0];let allowed=null;
+ if(mode==='review'){if(!latest?.state?.testData?.length)return alert('Chưa có phiên gần nhất để chọn nhóm ôn tập.');const selected=[...document.querySelectorAll('#review-levels input:checked')].map(x=>x.value);if(!selected.length)return alert('Chọn ít nhất một nhóm.');allowed=latest.state.testData.filter(w=>selected.includes((w.Level||'').charAt(0)) && w.Status==='Completed').map(w=>[w.Q,w.A,w.Extra||'']);if(!allowed.length)return alert('Phiên gần nhất không có từ thuộc nhóm đã chọn.');}
+ closeShuffle();closeCourseModal();await newCloudSession(c,mode,allowed);
+}
+async function newCloudSession(course,mode='original',allowed=null){
+ if(!cloudUser)return alert('Cần đăng nhập.');const {data:words,error:we}=await cloudClient.from('words').select('*').eq('course_id',course.id).order('ordinal');if(we)return alert(we.message);
+ let chosen=allowed?words.filter(w=>allowed.some(t=>t[0]===w.question&&t[1]===w.answer&&t[2]===w.extra)):words;
+ if(!chosen.length)return alert('Không có từ phù hợp.');if(mode!=='original')chosen=shuffleList(chosen);
+ const {data:s,error:se}=await cloudClient.from('sessions').insert({course_id:course.id,user_id:cloudUser.id,state:{}}).select('id,revision').single();if(se)return alert(se.message);
+ courseId=course.id;sessionId=s.id;cloudRevision=Number(s.revision);courseName=course.name;const cfg=course.settings||{};ttsLang=cfg.ttsLang||'en-US';showQuestion=cfg.showQuestion!==false;showExtra=cfg.showExtra!==false;colExtra=cfg.colExtra??-1;
+ testData=chosen.map(w=>({Q:w.question,A:w.answer,Extra:w.extra,Status:'Unanswered',Score:null,Level:'Unanswered',FirstTryCorrect:null,ErrorCount:0,CorrectionCount:0,ActiveTimeSeconds:null,CompletedAt:''}));
+ currentIndex=0;sessionCompleted=false;switchPage('typing');loadQuestion();saveProgress(false);
+}
+function openCourseEdit(course){selectedCourse=course;editedRows=null;editChanged=false;$('edit-course-name').value=course.name;$('edit-file').value='';$('edit-preview').textContent='';$('confirm-edit').disabled=true;$('edit-modal').style.display='flex';}
+function closeEditModal(){$('edit-modal').style.display='none';}
+async function previewCourseEdit(){
+ const c=selectedCourse;const file=$('edit-file').files[0];editedRows=null;editChanged=false;$('confirm-edit').disabled=true;
+ if(!file){$('edit-preview').textContent='Chọn file Excel mới để đối chiếu.';return;}
+ try{const book=XLSX.read(await file.arrayBuffer(),{type:'array'});const rows=XLSX.utils.sheet_to_json(book.Sheets[book.SheetNames[0]],{header:1,defval:''});const headers=rows.shift()||[];
+ if(headers.length<2)throw Error('Excel cần ít nhất hai cột: câu hỏi, trả lời.');editedRows=rows.filter(r=>String(r[0]||'').trim()&&String(r[1]||'').trim()).map(r=>({question:String(r[0]).trim(),answer:String(r[1]).trim(),extra:String(r[2]||'').trim()}));
+ if(!editedRows.length)throw Error('Không tìm thấy từ hợp lệ.');
+ const {data:old,error}=await cloudClient.from('words').select('*').eq('course_id',c.id).order('ordinal');if(error)throw error;
+ const key=w=>JSON.stringify([w.question,w.answer,w.extra||'']);const count=(arr)=>{const m=new Map();arr.forEach(w=>m.set(key(w),(m.get(key(w))||0)+1));return m;};const prev=count(old),next=count(editedRows);let added=0,removed=0;for(const [k,n] of next)added+=Math.max(0,n-(prev.get(k)||0));for(const [k,n] of prev)removed+=Math.max(0,n-(next.get(k)||0));
+ editChanged=added>0||removed>0||editedRows.some((w,i)=>key(w)!==key(old[i]||{}));$('edit-preview').innerHTML=`<p>${old.length} → ${editedRows.length} từ</p><p>Thêm: ${added} · Bỏ/thay đổi: ${removed}</p><p>${removed?'Danh sách hiện hành được thay thế; lịch sử phiên vẫn giữ snapshot cũ.':'Dữ liệu hiện hành sẽ được cập nhật.'}</p><p>Xem trước:</p><div class="stack">${editedRows.filter((w,i)=>key(w)!==key(old[i]||{})).slice(0,12).map(w=>`<div>${safe(w.question)} → ${safe(w.answer)} ${w.extra?safe('· '+w.extra):''}</div>`).join('')||'Không thay đổi nội dung'}</div>`;
+ $('confirm-edit').disabled=false;
+ }catch(e){$('edit-preview').textContent=e.message;}
+}
+async function commitCourseEdit(){
+ if(!editedRows||!selectedCourse||!cloudUser)return;const c=selectedCourse;const name=$('edit-course-name').value.trim();if(!name)return alert('Tên bài học không được để trống.');
+ if(!confirm('Xác nhận thay thế danh sách từ hiện hành? Các phiên đang học dở cần hoàn tất hoặc mở lại bằng snapshot cũ; lịch sử không bị xóa.'))return;
+ $('confirm-edit').disabled=true;
+ try{const payload=editedRows.map((w,i)=>({user_id:cloudUser.id,course_id:c.id,ordinal:i,...w}));
+ // Atomic database function: prevents temporary empty vocab and revision races.
+ const {error}=await cloudClient.rpc('replace_cheese_words',{p_course_id:c.id,p_name:name,p_words:payload.map(({ordinal,question,answer,extra})=>({ordinal,question,answer,extra}))});if(error)throw error;
+ closeEditModal();closeCourseModal();await renderMenu();alert('Đã lưu phiên bản hiện hành. Lịch sử phiên cũ được giữ.');
+ }catch(e){$('confirm-edit').disabled=false;alert('Không thể cập nhật: '+e.message);}
 }
 function restoreSnapshot(snap){
   suspendCloudSync=true;

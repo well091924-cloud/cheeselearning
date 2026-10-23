@@ -62,26 +62,32 @@ body{margin:0;min-height:100vh;font-family:Segoe UI,Tahoma,sans-serif;color:var(
 body{display:block;padding:96px 18px 28px;background:#fcfdfb}.main-container{margin:26px auto}.toolbar{background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px;box-shadow:0 2px 14px #1018280d;top:10px;left:max(12px,calc((100vw - 1180px)/2));right:max(12px,calc((100vw - 1180px)/2))}
 .nav-btn{font-weight:650}.nav-btn.selected{background:#e9f9ef;border-color:#9ad5aa;color:#126d31}
 .page{max-width:1100px;margin:20px auto}.page[hidden]{display:none!important}.secondary{color:#667085}.sheet{border:1px solid #e5e7eb;background:#fff;border-radius:16px;padding:20px;margin:14px 0}.wide{width:100%}.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.lesson-row{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #edf0ee;padding:14px 2px;gap:12px}.lesson-row:last-child{border:0}.lesson-row button{cursor:pointer}.stack{display:grid;gap:10px}.auth-field{width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:8px;margin:4px 0 12px}.bar{height:9px;display:flex;overflow:hidden;background:#eaecf0;border-radius:8px;min-width:145px}.bar span{height:100%}.lvl-A{background:#178a45}.lvl-B{background:#86c95c}.lvl-C{background:#ffca50}.lvl-D{background:#e77864}.extra-info{color:#667085;font-size:clamp(.95rem,2vw,1.15rem);min-height:20px}.details-toggle{background:#e9f9ed;color:#16803c;border:0;border-radius:50%;padding:10px 15px;cursor:pointer;font-size:1.25rem}.details-panel{margin:15px auto;max-width:780px;transition:.2s}.details-panel[hidden]{display:none}.details-panel .session-stats{max-width:none}.view-muted{opacity:.35}.modal-content{max-height:90vh;overflow:auto}.notice{white-space:pre-wrap;color:#667085;font-size:.85rem}.auth-inline{margin-left:auto;font-size:.85rem}.compact{font-size:.9rem}.danger{color:#b42318}.course-name{font-weight:700}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #8adeab;outline-offset:2px}@media(max-width:720px){.toolbar{position:static;margin:-80px 0 20px}.main-container{margin:10px auto}.page{margin:10px auto}.auth-inline{margin-left:0}.lesson-row{flex-wrap:wrap}}
+
+/* v2.1 minimal visual system */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;900&display=swap');
+:root{--green:#4A943E;--red:#D9361E;--ink:#000;--muted:#4A943E;--line:#FBE580;--panel:#FFFDE1;--amber:#FFCB3D}
+body{font-family:Inter,Arial,sans-serif!important;color:#000;background:#fff;padding:102px 28px 30px;min-height:100vh}
+button,input,select{font-family:inherit}button{cursor:pointer}
+.topbar{height:76px;background:#FFCB3D;position:fixed;top:0;left:0;right:0;display:flex;align-items:center;gap:22px;padding:0 clamp(18px,3vw,52px);z-index:40}
+.brand{color:#fff;font-size:clamp(1.35rem,2.5vw,2.2rem);font-weight:900;letter-spacing:-.05em}.header-actions{margin-left:auto;display:flex;gap:14px}.header-icon,.hamburger{color:white;border:none;background:transparent;font-size:30px;padding:5px 9px;line-height:1}.hamburger{font-size:24px}.header-icon:hover,.hamburger:hover{background:#ffffff22;border-radius:8px}
+.sidebar{position:fixed;left:0;top:76px;bottom:0;width:min(310px,88vw);background:#FFFDE1;z-index:51;transform:translateX(-103%);transition:transform .24s ease;box-shadow:8px 0 28px #0001;padding:30px 23px;display:flex;flex-direction:column;gap:46px}.sidebar.open{transform:none}.sidebar-backdrop{position:fixed;inset:76px 0 0;background:#0005;z-index:50}.sidebar-profile{font-size:1.2rem;font-weight:500;overflow-wrap:anywhere}.sidebar-icons{display:flex;gap:14px;margin-top:18px}.sidebar-icons button{border:0;background:#FFCB3D;border-radius:50%;height:45px;width:45px;font-size:1.4rem}.sidebar nav{display:grid;gap:12px}.sidebar .nav-btn,.sidebar-command{border:0;background:transparent;text-align:left;padding:16px 14px;border-radius:12px;font-size:1.07rem;font-weight:500;color:#000}.sidebar .nav-btn:hover,.sidebar-command:hover{background:#FBE580}.sidebar-bottom{display:grid;gap:10px;margin-top:auto}.sidebar-command{display:block;width:100%;background:#FFCB3D;text-align:center;font-weight:500}
+.main-container{margin:0 auto;max-width:1340px;min-height:calc(100dvh - 136px);display:flex;flex-direction:column;position:relative}.progress-wrap{width:min(92%,960px);max-width:none;margin:12px auto 0}.progress-meta{color:#FFCB3D;justify-content:center;font-size:1.15rem}.progress-track{height:11px;background:#FFFDE1}.progress-fill{background:#FBE580}.course-name{font-size:.9rem;color:#4A943E;margin-top:18px;font-weight:400}.question{font-weight:500;color:#000;font-size:clamp(1.6rem,3vw,2.6rem);margin:auto auto 25px;max-width:1000px}.typing-container{margin:0 auto;font-weight:400;font-size:clamp(2.9rem,7.2vw,6rem);min-height:130px;letter-spacing:clamp(1px,.4vw,5px);padding:0 5px 10px;max-width:100%}.char{min-width:clamp(26px,5vw,62px)}.char.correct{color:#4A943E}.char.incorrect{color:#D9361E;background:transparent}.char.pending{border-bottom:5px solid #4A943E}.char.pending::after{color:#FFFDE1}.typing-container:hover .char.pending::after{color:#FBE580}.extra-info{color:#4A943E;font-size:clamp(1.05rem,2vw,1.7rem);margin:20px 0 auto;min-height:30px}
+.live-grid{width:min(800px,100%);max-width:none;margin:30px auto 18px;gap:12px}.metric{background:#FFFDE1;border:none;border-radius:22px;text-align:center;padding:16px 8px}.metric-label{font-size:.85rem;color:#4A943E;font-weight:400}.metric-value{font-size:clamp(1.2rem,2vw,1.8rem);font-weight:400;color:#000}.metric-note{display:none}.hint{position:fixed;right:34px;bottom:15px;text-align:right;font-size:.82rem;line-height:1.5;color:#4A943E;margin:0;max-width:340px;z-index:2}.details-toggle{border:none;border-radius:0;background:transparent;color:#4A943E;font-size:1.7rem;margin:0 auto 38px;padding:9px 20px}.details-panel{display:none}.details-panel[hidden]{display:none!important}
+.main-container.stats-open .progress-wrap,.main-container.stats-open .course-name,.main-container.stats-open .question,.main-container.stats-open .extra-info,.main-container.stats-open .typing-container,.main-container.stats-open .live-grid,.main-container.stats-open .hint,.main-container.stats-open #completion-panel{display:none!important}.main-container.stats-open #details-panel{display:flex!important;align-items:center;justify-content:center;flex:1;width:100%;max-width:1200px;animation:slideUp .28s ease}.main-container.stats-open .details-toggle{order:2;transform:rotate(180deg)}@keyframes slideUp{from{opacity:0;transform:translateY(45px)}to{opacity:1;transform:translateY(0)}}.session-stats{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:22px;max-width:1050px!important}.stat{width:clamp(155px,17vw,240px);aspect-ratio:1;border-radius:50%;background:#FFCB3D;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;gap:10px}.stat:nth-child(2n){background:#FBE580}.stat:nth-child(3n){background:#FFFDE1}.stat-label{font-size:.96rem;color:#000;font-weight:400}.stat-value{font-size:clamp(2rem,3vw,3.2rem);font-weight:900;margin:0}.stat-sub{font-size:.8rem}
+.page{max-width:1140px;margin:30px auto}.page h1{font-size:clamp(1.8rem,3vw,2.6rem);font-weight:500}.course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:20px}.lesson-row{background:#FFFDE1;border:1px solid #FBE580;border-radius:22px;padding:24px;display:grid;gap:15px;cursor:pointer}.lesson-row:hover{border-color:#FFCB3D}.course-name{font-weight:400}.bar{background:#fff;height:15px;border-radius:99px;min-width:180px}.lvl-A{background:#4A943E}.lvl-B{background:#FFCB3D}.lvl-C{background:#FBE580}.lvl-D{background:#D9361E}.icon-btn{border:1px solid #FBE580;border-radius:12px;background:#FFFDE1;color:#000;font-size:1rem;padding:11px 15px}.icon-btn:hover{background:#FBE580}.modal-overlay{z-index:90}.modal-content{width:min(96vw,540px);border-radius:24px;max-height:90vh;overflow:auto}.modal-content h2{font-weight:500}.course-modal{width:min(1100px,96vw)}.course-modal-layout{display:grid;grid-template-columns: minmax(240px,1fr) minmax(270px,1.3fr);gap:24px}.course-modal .metric-pair{display:flex;justify-content:space-between;border-bottom:1px solid #FBE580;padding:10px 2px;gap:14px}.history-row{display:grid;gap:5px;margin:12px 0}.history-title{font-size:.86rem}.modal-actions{margin-top:24px}.form-group label{font-weight:500}.btn-start{background:#4A943E;font-weight:500}.small-note,.secondary,.notice{color:#4A943E}.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+@media(max-width:720px){body{padding:92px 14px 20px}.topbar{height:66px}.sidebar{top:66px}.sidebar-backdrop{inset:66px 0 0}.header-actions{gap:0}.header-icon{font-size:25px}.main-container{min-height:calc(100dvh - 110px)}.typing-container{font-size:clamp(2.1rem,8vw,4.6rem)}.live-grid{grid-template-columns:repeat(2,1fr)}.hint{position:static;align-self:flex-end;order:4;margin:10px 0 4px}.details-toggle{margin:0 auto}.session-stats{gap:12px}.stat{width:clamp(138px,40vw,190px)}.course-modal-layout{grid-template-columns:1fr}.page{margin:8px auto}}
 </style>
 </head>
 <body>
-<div class="toolbar">
-  <button class="icon-btn nav-btn selected" data-page="typing" onclick="switchPage('typing')">⌨️ Typing</button>
-  <button class="icon-btn nav-btn" data-page="menu" onclick="switchPage('menu')">🧀 Your Cheese Menu</button>
-  <button class="icon-btn nav-btn" data-page="dashboard" onclick="switchPage('dashboard')">📈 Dashboard</button>
-  <label for="file-upload" class="icon-btn" title="Nhập file Excel">📁 Nhập file</label>
-  <input type="file" id="file-upload" accept=".xlsx,.xls,.csv">
-  <button class="icon-btn" title="Xuất kết quả Excel" onclick="exportExcel()">💾 Xuất Excel</button>
-  <button class="icon-btn" title="Cài đặt" onclick="openSettings()">⚙️ Cài đặt</button>
-  <button class="icon-btn" title="Lưu tiến trình" onclick="saveProgress(true)">⏸️ Lưu tiến trình</button>
-  <span id="status-pill" class="status-pill">Chưa bắt đầu</span>
-  <button id="account-button" class="icon-btn" onclick="openAccount()">👤 Khách / Đăng nhập</button>
-</div>
-
+<header class="topbar"><button class="hamburger" onclick="toggleSidebar()" aria-label="Mở menu" title="Menu">☰</button><span class="brand">Cheese Learning</span><div class="header-actions"><button class="header-icon" onclick="openSettings()" aria-label="Cài đặt" title="Cài đặt">⚙</button><button class="header-icon" onclick="saveProgress(true)" aria-label="Lưu" title="Lưu">▣</button><button class="header-icon" onclick="exportExcel()" aria-label="Tải xuống" title="Tải xuống">⇩</button></div></header>
+<div id="sidebar-backdrop" class="sidebar-backdrop" onclick="toggleSidebar(false)" hidden></div>
+<aside id="sidebar" class="sidebar" aria-label="Điều hướng" aria-hidden="true"><div class="sidebar-profile"><span id="account-button">Khách</span><div class="sidebar-icons"><button onclick="changePassword()" title="Đổi mật khẩu" aria-label="Đổi mật khẩu">⚿</button><button id="auth-action" onclick="openAccount()" title="Đăng nhập" aria-label="Đăng nhập">↪</button></div></div><nav><button class="nav-btn" data-page="menu" onclick="switchPage('menu')">Your Cheese Menu</button><button class="nav-btn" data-page="dashboard" onclick="switchPage('dashboard')">Dashboard</button></nav><div class="sidebar-bottom"><label for="file-upload" class="sidebar-command">Up load file xlsx.</label><button class="sidebar-command" onclick="switchPage('typing')">Back to Typing</button></div></aside>
+<input type="file" id="file-upload" accept=".xlsx,.xls,.csv" hidden>
+<span id="status-pill" class="sr-only" aria-live="polite">Chưa bắt đầu</span>
 <main class="main-container page" id="app-area">
   <div class="course-name" id="course-name">Chưa có bộ từ vựng</div>
   <div class="progress-wrap">
-    <div class="progress-meta"><span id="progress-text">Tiến độ: 0 / 0 từ</span><span id="accuracy-text">Đúng ngay lần đầu: —</span></div>
+    <div class="progress-meta"><span id="progress-text">0/0</span></div>
     <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
   </div>
   <div class="question" id="question-text">Tải file Excel để bắt đầu...</div>
@@ -89,17 +95,17 @@ body{display:block;padding:96px 18px 28px;background:#fcfdfb}.main-container{mar
   <div class="typing-container" id="display-area" aria-label="Vùng nhập từ"></div>
   <input type="text" id="hidden-input" autocomplete="off" autocapitalize="off" spellcheck="false">
   <div class="live-grid">
-    <div class="metric"><div class="metric-label">Thời gian hoạt động</div><div class="metric-value" id="active-time">0,0 giây</div><div class="metric-note">Không tính lúc tạm dừng</div></div>
-    <div class="metric"><div class="metric-label">Lượt nhập sai</div><div class="metric-value" id="error-count">0</div><div class="metric-note">Từng ký tự sai đã nhập</div></div>
-    <div class="metric"><div class="metric-label">Lần sửa</div><div class="metric-value" id="correction-count">0</div><div class="metric-note">Xóa khi đã có lỗi</div></div>
-    <div class="metric"><div class="metric-label">Điểm tạm tính</div><div class="metric-value" id="live-score">—</div><div class="metric-note" id="live-level">Chưa hoàn thành</div></div>
+    <div class="metric"><div class="metric-label">Thời gian hoạt động</div><div class="metric-value" id="active-time">0,0 giây</div></div>
+    <div class="metric"><div class="metric-label">Lượt nhập sai</div><div class="metric-value" id="error-count">0</div></div>
+    <div class="metric"><div class="metric-label">Lần sửa</div><div class="metric-value" id="correction-count">0</div></div>
+    <div class="metric"><div class="metric-label">Điểm tạm tính</div><div class="metric-value" id="live-score">—</div><span class="sr-only" id="live-level"></span></div>
   </div>
-  <button class="details-toggle" onclick="toggleDetails()" aria-label="Xem chi tiết phiên" aria-expanded="false" id="details-toggle">⌃</button>
+  <button class="details-toggle" onclick="toggleDetails()" aria-label="Xem thống kê phiên" aria-expanded="false" id="details-toggle">▼</button>
   <div class="details-panel" id="details-panel" hidden>
-  <p class="secondary">Thống kê phiên học (chỉ tính các từ đã hoàn thành)</p>
+  
   <div class="session-stats">
     <div class="stat"><div class="stat-label">Đã hoàn thành</div><div class="stat-value" id="completed-count">0</div></div>
-    <div class="stat"><div class="stat-label">Đúng ngay lần đầu</div><div class="stat-value" id="first-try-count">0</div></div>
+    <div class="stat"><div class="stat-label">Đúng ngay lần đầu</div><div class="stat-value" id="first-try-count">0</div><div class="stat-sub" id="first-try-rate">—</div></div>
     <div class="stat"><div class="stat-label">Nhóm C + D</div><div class="stat-value" id="weak-count">0</div></div>
     <div class="stat"><div class="stat-label">Điểm TB phiên</div><div class="stat-value" id="average-score">—</div></div>
   </div>
@@ -113,12 +119,15 @@ body{display:block;padding:96px 18px 28px;background:#fcfdfb}.main-container{mar
       <div class="summary-card">Điểm trung bình<strong id="sum-score">—</strong></div>
       <div class="summary-card">Cần ôn (C + D)<strong id="sum-weak">0</strong></div>
     </div>
-    <p class="small-note">Xuất Excel để tải hai sheet: Word Results (chi tiết từng từ) và Summary (thống kê phiên). Các từ chưa làm được đánh dấu Unanswered và không bị tính vào điểm trung bình.</p>
+  
   </section>
 </main>
-<section class="page" id="menu-page" hidden><div class="sheet"><h2>🧀 Your Cheese Menu</h2><p class="secondary">Mỗi bài học có nhiều phiên, không ghi đè lịch sử. Chế độ Khách chỉ lưu một bài hiện tại.</p><div id="course-list"></div></div><div class="sheet" id="course-detail" hidden></div></section>
-<section class="page" id="dashboard-page" hidden><div class="sheet"><h2>📈 Dashboard</h2><p class="secondary">Tổng quan các bài học của tài khoản.</p><div id="dashboard-body"></div></div></section>
-<div class="modal-overlay" id="account-modal"><div class="modal-content"><h2>👤 Tài khoản Cheese</h2><p id="account-status" class="secondary"></p><label>Email<input class="auth-field" id="auth-email" type="email" autocomplete="email"></label><label>Mật khẩu<input class="auth-field" id="auth-password" type="password" autocomplete="current-password" minlength="6"></label><div class="actions"><button class="icon-btn" onclick="login()">Đăng nhập</button><button class="icon-btn" onclick="register()">Đăng ký</button><button class="icon-btn" onclick="logout()">Đăng xuất</button><button class="icon-btn" onclick="closeAccount()">Đóng</button></div><p class="notice" id="auth-notice">Không nhập service_role key vào trình duyệt. Đăng ký có thể cần xác nhận email tùy cài đặt Supabase.</p></div></div>
+<section class="page" id="menu-page" hidden><h1>Your Cheese Menu</h1><div id="course-list" class="course-grid"></div><div id="course-detail" hidden></div></section>
+<section class="page" id="dashboard-page" hidden><h1>Dashboard</h1><div id="dashboard-body"></div></section>
+<div class="modal-overlay" id="account-modal"><div class="modal-content"><h2>👤 Tài khoản Cheese</h2><p id="account-status" class="secondary"></p><label>Email<input class="auth-field" id="auth-email" type="email" autocomplete="email"></label><label>Mật khẩu<input class="auth-field" id="auth-password" type="password" autocomplete="current-password" minlength="6"></label><div class="actions"><button class="icon-btn" onclick="login()">Đăng nhập</button><button class="icon-btn" onclick="closeAccount()">Đóng</button></div><p class="notice" id="auth-notice"></p></div></div>
+<div class="modal-overlay" id="course-modal"><div class="modal-content course-modal"><div class="actions" style="justify-content:space-between"><h2 id="detail-course-title">Bài học</h2><button class="icon-btn" onclick="closeCourseModal()" aria-label="Đóng">✕</button></div><div id="course-modal-body"></div></div></div>
+<div class="modal-overlay" id="edit-modal"><div class="modal-content"><h2>Chỉnh sửa bài học</h2><label>Tên bài học<input class="auth-field" id="edit-course-name"></label><label>Excel chỉnh sửa<input type="file" accept=".xlsx,.xls" id="edit-file"></label><button class="icon-btn" onclick="previewCourseEdit()">Đọc và đối chiếu</button><div id="edit-preview"></div><div class="actions"><button id="confirm-edit" class="icon-btn" onclick="commitCourseEdit()" disabled>Xác nhận lưu</button><button class="icon-btn" onclick="closeEditModal()">Hủy</button></div></div></div>
+<div class="modal-overlay" id="shuffle-modal"><div class="modal-content"><h2>Bắt đầu phiên mới</h2><div class="form-group"><label><input type="radio" name="shuffle" value="original" checked> Thứ tự gốc</label><label><input type="radio" name="shuffle" value="all"> Trộn toàn bộ từ</label><label><input type="radio" name="shuffle" value="review"> Trộn từ ôn tập tùy chỉnh</label></div><div class="actions" id="review-levels"><label><input type="checkbox" value="A"> A</label><label><input type="checkbox" value="B"> B</label><label><input type="checkbox" value="C" checked> C</label><label><input type="checkbox" value="D" checked> D</label></div><div class="actions"><button class="btn-start" onclick="confirmNewSession()">Bắt đầu</button><button class="icon-btn" onclick="closeShuffle()">Hủy</button></div></div></div>
 <div class="modal-overlay" id="config-modal">
   <div class="modal-content">
     <h2>⚙️ Cài đặt bài học</h2>
@@ -434,10 +443,10 @@ function completeCurrentWord(){
 }
 function updateProgress(){
   const total=testData.length, done=testData.filter(x=>x.Status==='Completed').length;
-  $('progress-text').textContent=`Tiến độ: ${Math.min(currentIndex,total)} / ${total} từ`;
+  $('progress-text').textContent=`${Math.min(currentIndex,total)}/${total}`;
   $('progress-fill').style.width=(total?Math.min(currentIndex,total)/total*100:0)+'%';
   const first=testData.filter(x=>x.Status==='Completed'&&x.FirstTryCorrect==='Yes').length;
-  $('accuracy-text').textContent=`Đúng ngay lần đầu: ${done?Math.round(first/done*100)+'%':'—'}`;
+  $('first-try-rate').textContent=done?Math.round(first/done*100)+'%':'—';
 }
 function updateSessionStats(){
   const completed=testData.filter(x=>x.Status==='Completed');
@@ -464,7 +473,7 @@ function finishSession(){
   questionText.textContent='🎉 Hoàn thành bài học!';
   displayArea.innerHTML='';hiddenInput.blur();
   setStatus('Đã hoàn thành');
-  $('hint-text').textContent='Bạn có thể xuất Excel để xem chi tiết từng từ và thống kê toàn bộ phiên học.';
+  $('hint-text').textContent='Ctrl + J để nghe phát âm.';
   const done=testData.filter(x=>x.Status==='Completed');
   const first=done.filter(x=>x.FirstTryCorrect==='Yes').length;
   const weak=done.filter(x=>x.Score<70).length;
@@ -573,13 +582,13 @@ function exportExcel(){
   sumWs['!cols']=[{wch:36},{wch:100}];
   XLSX.utils.book_append_sheet(wb,sumWs,'Summary');
   const safeName=(courseName||'Vocabulary').replace(/[\\/:*?"<>|]+/g,'_');
-  XLSX.writeFile(wb,`Ket_Qua_${safeName}.xlsx`);
+  XLSX.writeFile(wb,`${safeName}_${new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Ho_Chi_Minh"})}.xlsx`);
 }
 hiddenInput.addEventListener('keydown',e=>{
   if(e.key==='Escape'){pauseClock('Đã tạm dừng');}
 });
 document.body.addEventListener('click',e=>{
-  if(!configModal.contains(e.target)&&configModal.style.display!=='flex'&&testData.length&&currentIndex<testData.length&&!sessionCompleted&&!waitingForResumeKey){
+  if(!$('sidebar').classList.contains('open')&&!e.target.closest('button, a, label, input, select, .modal-overlay, .sidebar')&&!configModal.contains(e.target)&&configModal.style.display!=='flex'&&testData.length&&currentIndex<testData.length&&!sessionCompleted&&!waitingForResumeKey){
     hiddenInput.focus({preventScroll:true});
   }
 });
