@@ -40,7 +40,7 @@ async function createCloudCourseAndSession(){
   if(!cloudUser)return;
   try{
     suspendCloudSync=true;
-    const {data:course,error:ce}=await cloudClient.from('courses').insert({user_id:cloudUser.id,name:courseName,settings:{ttsLang,showQuestion,showExtra,colExtra}}).select('id').single();
+    const {data:course,error:ce}=await cloudClient.from('courses').insert({user_id:cloudUser.id,name:courseName,settings:{ttsLang,ttsVoiceURI,showQuestion,showExtra,colExtra,fontScale}}).select('id').single();
     if(ce)throw ce;
     courseId=course.id;
     const chunks=[];for(let i=0;i<testData.length;i+=200) chunks.push(testData.slice(i,i+200).map((w,j)=>({user_id:cloudUser.id,course_id:courseId,ordinal:i+j,question:w.Q,answer:w.A,extra:w.Extra||''})));
@@ -52,7 +52,7 @@ async function createCloudCourseAndSession(){
   }catch(err){suspendCloudSync=false;setStatus('Lỗi lưu đám mây',true);alert('Không thể tạo bài học trên Supabase: '+err.message+'; không coi tiến độ là đã đồng bộ.');}
 }
 function captureSnapshot(){
-  return {version:2,testData,currentIndex,ttsLang,courseName,sessionCompleted,colExtra,showQuestion,showExtra,courseId,sessionId,
+  return {version:2,testData,currentIndex,ttsLang,ttsVoiceURI,fontScale,activeColumns,courseName,sessionCompleted,colExtra,showQuestion,showExtra,courseId,sessionId,
     currentInput:hiddenInput.value,activeMsCurrent:elapsedActiveMs(),errorCountCurrent,correctionCountCurrent,
     wrongPositionsCurrent:[...wrongPositionsCurrent],savedAt:new Date().toISOString()};
 }
@@ -87,7 +87,7 @@ async function flushCloudSave(){
 }
 async function cloudCourses(){
   if(!cloudUser)return [];
-  const {data,error}=await cloudClient.from('courses').select('id,name,created_at,words(id),sessions(id,created_at,status,state)').order('created_at',{ascending:false});
+  const {data,error}=await cloudClient.from('courses').select('id,name,settings,created_at,words(id),sessions(id,created_at,status,state)').order('created_at',{ascending:false});
   if(error)throw error;
   return data||[];
 }
@@ -130,7 +130,8 @@ async function newCloudSession(course,mode='original',allowed=null){
  let chosen=allowed?words.filter(w=>allowed.some(t=>t[0]===w.question&&t[1]===w.answer&&t[2]===w.extra)):words;
  if(!chosen.length)return alert('Không có từ phù hợp.');if(mode!=='original')chosen=shuffleList(chosen);
  const {data:s,error:se}=await cloudClient.from('sessions').insert({course_id:course.id,user_id:cloudUser.id,state:{}}).select('id,revision').single();if(se)return alert(se.message);
- courseId=course.id;sessionId=s.id;cloudRevision=Number(s.revision);courseName=course.name;const cfg=course.settings||{};ttsLang=cfg.ttsLang||'en-US';showQuestion=cfg.showQuestion!==false;showExtra=cfg.showExtra!==false;colExtra=cfg.colExtra??-1;
+ courseId=course.id;sessionId=s.id;cloudRevision=Number(s.revision);courseName=course.name;const cfg=course.settings||{};ttsLang=cfg.ttsLang||'en-US';ttsVoiceURI=cfg.ttsVoiceURI||'';fontScale=Number(cfg.fontScale)||100;showQuestion=cfg.showQuestion!==false;showExtra=cfg.showExtra!==false;colExtra=cfg.colExtra??-1;applyTypingScale(fontScale);
+ activeColumns={q:null,a:null,extra:colExtra};
  testData=chosen.map(w=>({Q:w.question,A:w.answer,Extra:w.extra,Status:'Unanswered',Score:null,Level:'Unanswered',FirstTryCorrect:null,ErrorCount:0,CorrectionCount:0,ActiveTimeSeconds:null,CompletedAt:''}));
  currentIndex=0;sessionCompleted=false;switchPage('typing');loadQuestion();saveProgress(false);
 }
@@ -161,7 +162,7 @@ async function commitCourseEdit(){
 function restoreSnapshot(snap){
   suspendCloudSync=true;
   testData=snap.testData;currentIndex=Math.min(snap.currentIndex||0,testData.length);
-  courseName=snap.courseName||'Vocabulary';ttsLang=snap.ttsLang||'en-US';showQuestion=snap.showQuestion!==false;showExtra=snap.showExtra!==false;
+  courseName=snap.courseName||'Vocabulary';ttsLang=snap.ttsLang||'en-US';ttsVoiceURI=snap.ttsVoiceURI||'';fontScale=Number(snap.fontScale)||100;activeColumns=snap.activeColumns||activeColumns;applyTypingScale(fontScale);showQuestion=snap.showQuestion!==false;showExtra=snap.showExtra!==false;
   colExtra=snap.colExtra??-1;sessionCompleted=!!snap.sessionCompleted;active=false;waitingForResumeKey=true;
   if(sessionCompleted){finishSession();}else{
     loadQuestion();activeMsCurrent=Number(snap.activeMsCurrent)||0;
