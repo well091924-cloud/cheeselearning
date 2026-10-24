@@ -40,11 +40,15 @@ async function createCloudCourseAndSession(){
   if(!cloudUser)return;
   try{
     suspendCloudSync=true;
-    const {data:course,error:ce}=await cloudClient.from('courses').insert({user_id:cloudUser.id,name:courseName,settings:{ttsLang,ttsVoiceURI,showQuestion,showExtra,colExtra,fontScale}}).select('id').single();
+    const {data:course,error:ce}=await cloudClient.from('courses').insert({user_id:cloudUser.id,name:courseName,settings:{ttsLang,ttsVoiceURI,showQuestion,showExtra,colExtra}}).select('id').single();
     if(ce)throw ce;
     courseId=course.id;
     const chunks=[];for(let i=0;i<testData.length;i+=200) chunks.push(testData.slice(i,i+200).map((w,j)=>({user_id:cloudUser.id,course_id:courseId,ordinal:i+j,question:w.Q,answer:w.A,extra:w.Extra||''})));
-    for(const chunk of chunks){const {error}=await cloudClient.from('words').insert(chunk);if(error)throw error;}
+    for(const chunk of chunks){
+      const {data:created,error}=await cloudClient.from('words').insert(chunk).select('id,ordinal');
+      if(error)throw error;
+      for(const word of created||[]){if(testData[word.ordinal])testData[word.ordinal].WordId=word.id;}
+    }
     const {data:session,error:se}=await cloudClient.from('sessions').insert({user_id:cloudUser.id,course_id:courseId,state:{},status:'in_progress'}).select('id,revision').single();
     if(se)throw se;
     sessionId=session.id;cloudRevision=Number(session.revision);
@@ -52,7 +56,7 @@ async function createCloudCourseAndSession(){
   }catch(err){suspendCloudSync=false;setStatus('Lỗi lưu đám mây',true);alert('Không thể tạo bài học trên Supabase: '+err.message+'; không coi tiến độ là đã đồng bộ.');}
 }
 function captureSnapshot(){
-  return {version:2,testData,currentIndex,ttsLang,ttsVoiceURI,fontScale,activeColumns,courseName,sessionCompleted,colExtra,showQuestion,showExtra,courseId,sessionId,
+  return {version:2,testData,currentIndex,ttsLang,ttsVoiceURI,courseName,sessionCompleted,colExtra,showQuestion,showExtra,courseId,sessionId,
     currentInput:hiddenInput.value,activeMsCurrent:elapsedActiveMs(),errorCountCurrent,correctionCountCurrent,
     wrongPositionsCurrent:[...wrongPositionsCurrent],savedAt:new Date().toISOString()};
 }
@@ -87,7 +91,7 @@ async function flushCloudSave(){
 }
 async function cloudCourses(){
   if(!cloudUser)return [];
-  const {data,error}=await cloudClient.from('courses').select('id,name,settings,created_at,words(id),sessions(id,created_at,status,state)').order('created_at',{ascending:false});
+  const {data,error}=await cloudClient.from('courses').select('id,name,created_at,settings,words(id),sessions(id,created_at,status,state)').order('created_at',{ascending:false});
   if(error)throw error;
   return data||[];
 }
@@ -110,7 +114,7 @@ function closeCourseModal(){$('course-modal').style.display='none';}
 async function showCourse(course){
  selectedCourse=course;$('detail-course-title').textContent=course.name;
  const body=$('course-modal-body');body.replaceChildren();const sessions=[...course.sessions].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));const latest=sessions[0],m=latest?sessionMetrics(latest):null;
- const left=document.createElement('div');const metrics=[['Điểm trung bình',m?m.avg.toFixed(1):'—'],['Tổng số từ',course.words.length],['Đã hoàn thành',m?m.done.length:'0'],['Thời gian hoạt động TB (s)',m?m.active.toFixed(1):'—'],...['A','B','C','D'].map(k=>['Nhóm '+k,m?m.levels[k]:0])];left.innerHTML=metrics.map(([a,b])=>`<div class="metric-pair"><span>${safe(a)}</span><strong>${safe(b)}</strong></div>`).join('');
+ const left=document.createElement('div');const metrics=[['Điểm trung bình',m?m.avg.toFixed(1):'—'],['Tổng số từ',course.words.length],['Đã hoàn thành',m?m.done.length:'0'],['Thời gian hoạt động TB (s)',m?m.active.toFixed(1):'—'],...['A','B','C','D'].map(k=>['Nhóm '+k,m?m.levels[k]:0])];left.innerHTML=metrics.map(([a,b])=>`<div class="metric-pair${a.startsWith('Nhóm ')?' group-metric':''}"><span>${safe(a)}</span><strong>${safe(b)}</strong></div>`).join('');
  const right=document.createElement('div');right.innerHTML='<h3>Lịch sử phiên</h3>';sessions.forEach(sess=>{const sm=sessionMetrics(sess);const r=document.createElement('div');r.className='history-row';r.innerHTML=`<div class="history-title">${new Date(sess.created_at).toLocaleString('vi-VN')} · ${sm.done.length}/${sm.total} · ${sm.avg.toFixed(1)} điểm</div>${progressBar(sm.levels)}`;right.append(r)});if(!sessions.length)right.textContent='Chưa có phiên học';
  const layout=document.createElement('div');layout.className='course-modal-layout';layout.append(left,right);body.append(layout);const buttons=document.createElement('div');buttons.className='actions modal-actions';
  const unfinished=sessions.find(x=>x.status==='in_progress' && x.state?.testData?.length);
@@ -118,22 +122,75 @@ async function showCourse(course){
  const start=document.createElement('button');start.className='icon-btn';start.textContent='Bắt đầu phiên học mới';start.onclick=()=>openShuffle(course);buttons.append(start);
  const edit=document.createElement('button');edit.className='icon-btn';edit.textContent='Chỉnh sửa bài học';edit.onclick=()=>openCourseEdit(course);buttons.append(edit);body.append(buttons);$('course-modal').style.display='flex';
 }
-function shuffleList(list){const a=[...list];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-function openShuffle(course){selectedCourse=course;$('shuffle-modal').style.display='flex';}
-function closeShuffle(){$('shuffle-modal').style.display='none';}
-async function confirmNewSession(){const mode=document.querySelector('input[name="shuffle"]:checked').value;const c=selectedCourse;const latest=[...c.sessions].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0];let allowed=null;
- if(mode==='review'){if(!latest?.state?.testData?.length)return alert('Chưa có phiên gần nhất để chọn nhóm ôn tập.');const selected=[...document.querySelectorAll('#review-levels input:checked')].map(x=>x.value);if(!selected.length)return alert('Chọn ít nhất một nhóm.');allowed=latest.state.testData.filter(w=>selected.includes((w.Level||'').charAt(0)) && w.Status==='Completed').map(w=>[w.Q,w.A,w.Extra||'']);if(!allowed.length)return alert('Phiên gần nhất không có từ thuộc nhóm đã chọn.');}
- closeShuffle();closeCourseModal();await newCloudSession(c,mode,allowed);
+let pendingSessionWords=[];
+async function openShuffle(course){
+  selectedCourse=course;
+  $('shuffle-modal').style.display='flex';
+  document.querySelector('input[name="shuffle"][value="original"]').checked=true;
+  $('filter-all').checked=true;
+  document.querySelectorAll('#review-levels input[value]').forEach(box=>{box.checked=false;});
+  toggleAllFilter();
+  $('filter-feedback').textContent='Đang tải nhóm từ…';
+  $('confirm-shuffle').disabled=true;
+  pendingSessionWords=[];
+  try{
+    const {data,error}=await cloudClient.from('words').select('*').eq('course_id',course.id).order('ordinal');
+    if(error)throw error;
+    if(selectedCourse?.id!==course.id || $('shuffle-modal').style.display!=='flex')return;
+    pendingSessionWords=data||[];
+    const counts=CheeseStudy.countGroups(pendingSessionWords,course.sessions);
+    $('count-all').textContent=`(${pendingSessionWords.length})`;
+    for(const [g,n] of Object.entries(counts)){
+      const badge=document.querySelector(`[data-count="${g}"]`);if(badge)badge.textContent=`(${n})`;
+    }
+    updateFilterState();
+  }catch(e){$('filter-feedback').textContent='Không thể tải từ: '+e.message;}
 }
-async function newCloudSession(course,mode='original',allowed=null){
- if(!cloudUser)return alert('Cần đăng nhập.');const {data:words,error:we}=await cloudClient.from('words').select('*').eq('course_id',course.id).order('ordinal');if(we)return alert(we.message);
- let chosen=allowed?words.filter(w=>allowed.some(t=>t[0]===w.question&&t[1]===w.answer&&t[2]===w.extra)):words;
- if(!chosen.length)return alert('Không có từ phù hợp.');if(mode!=='original')chosen=shuffleList(chosen);
- const {data:s,error:se}=await cloudClient.from('sessions').insert({course_id:course.id,user_id:cloudUser.id,state:{}}).select('id,revision').single();if(se)return alert(se.message);
- courseId=course.id;sessionId=s.id;cloudRevision=Number(s.revision);courseName=course.name;const cfg=course.settings||{};ttsLang=cfg.ttsLang||'en-US';ttsVoiceURI=cfg.ttsVoiceURI||'';fontScale=Number(cfg.fontScale)||100;showQuestion=cfg.showQuestion!==false;showExtra=cfg.showExtra!==false;colExtra=cfg.colExtra??-1;applyTypingScale(fontScale);
- activeColumns={q:null,a:null,extra:colExtra};
- testData=chosen.map(w=>({Q:w.question,A:w.answer,Extra:w.extra,Status:'Unanswered',Score:null,Level:'Unanswered',FirstTryCorrect:null,ErrorCount:0,CorrectionCount:0,ActiveTimeSeconds:null,CompletedAt:''}));
- currentIndex=0;sessionCompleted=false;switchPage('typing');loadQuestion();saveProgress(false);
+function toggleAllFilter(){
+  const all=$('filter-all').checked;
+  document.querySelectorAll('#review-levels input[value]').forEach(box=>{
+    if(all)box.checked=false;
+    box.disabled=all;
+  });
+  updateFilterState();
+}
+function updateFilterState(){
+  const all=$('filter-all').checked;
+  const selected=[...document.querySelectorAll('#review-levels input[value]:checked')].map(x=>x.value);
+  if(!pendingSessionWords.length){$('confirm-shuffle').disabled=true;return;}
+  const selectedWords=CheeseStudy.selectWords(pendingSessionWords,selectedCourse.sessions,{all,groups:selected},'original');
+  const count=selectedWords.length;
+  $('confirm-shuffle').disabled=!count || (!all&&!selected.length);
+  $('filter-feedback').textContent=all?`Học toàn bộ ${count} từ`:`Đã chọn ${count} từ`;
+}
+function closeShuffle(){$('shuffle-modal').style.display='none';pendingSessionWords=[];}
+async function confirmNewSession(){
+  const course=selectedCourse;
+  if(!course||!pendingSessionWords.length)return;
+  const mode=document.querySelector('input[name="shuffle"]:checked').value;
+  const all=$('filter-all').checked;
+  const groups=[...document.querySelectorAll('#review-levels input[value]:checked')].map(x=>x.value);
+  if(!all&&!groups.length)return alert('Hãy chọn ít nhất một nhóm từ hoặc toàn bộ học phần.');
+  const chosen=CheeseStudy.selectWords(pendingSessionWords,course.sessions,{all,groups},mode);
+  if(!chosen.length)return alert('Không có từ nào phù hợp với bộ lọc.');
+  $('confirm-shuffle').disabled=true;
+  try{
+    if(await newCloudSession(course,chosen)){
+      closeShuffle();closeCourseModal();
+    }
+  }finally{if($('confirm-shuffle'))$('confirm-shuffle').disabled=false;}
+}
+async function newCloudSession(course,selectedWords=null){
+  if(!cloudUser)return alert('Cần đăng nhập.');
+  let chosen=selectedWords;
+  if(!chosen){const {data,error}=await cloudClient.from('words').select('*').eq('course_id',course.id).order('ordinal');if(error)return alert(error.message);chosen=data||[];}
+  if(!chosen.length)return alert('Không có từ phù hợp.');
+  const {data:s,error:se}=await cloudClient.from('sessions').insert({course_id:course.id,user_id:cloudUser.id,state:{}}).select('id,revision').single();if(se){alert(se.message);return;}
+  courseId=course.id;sessionId=s.id;cloudRevision=Number(s.revision);courseName=course.name;
+  const cfg=course.settings||{};ttsLang=cfg.ttsLang||'en-US';ttsVoiceURI=cfg.ttsVoiceURI||'';showQuestion=cfg.showQuestion!==false;showExtra=cfg.showExtra!==false;colExtra=cfg.colExtra??-1;
+  testData=chosen.map(w=>({WordId:w.id,SourceRow:(w.ordinal??0)+2,Q:w.question,A:w.answer,Extra:w.extra||'',Status:'Unanswered',Score:null,Level:'Unanswered',FirstTryCorrect:null,ErrorCount:0,CorrectionCount:0,ActiveTimeSeconds:null,CompletedAt:''}));
+  currentIndex=0;sessionCompleted=false;switchPage('typing');loadQuestion();saveProgress(false);
+  return true;
 }
 function openCourseEdit(course){selectedCourse=course;editedRows=null;editChanged=false;$('edit-course-name').value=course.name;$('edit-file').value='';$('edit-preview').textContent='';$('confirm-edit').disabled=true;$('edit-modal').style.display='flex';}
 function closeEditModal(){$('edit-modal').style.display='none';}
@@ -162,7 +219,7 @@ async function commitCourseEdit(){
 function restoreSnapshot(snap){
   suspendCloudSync=true;
   testData=snap.testData;currentIndex=Math.min(snap.currentIndex||0,testData.length);
-  courseName=snap.courseName||'Vocabulary';ttsLang=snap.ttsLang||'en-US';ttsVoiceURI=snap.ttsVoiceURI||'';fontScale=Number(snap.fontScale)||100;activeColumns=snap.activeColumns||activeColumns;applyTypingScale(fontScale);showQuestion=snap.showQuestion!==false;showExtra=snap.showExtra!==false;
+  courseName=snap.courseName||'Vocabulary';ttsLang=snap.ttsLang||'en-US';ttsVoiceURI=snap.ttsVoiceURI||'';showQuestion=snap.showQuestion!==false;showExtra=snap.showExtra!==false;
   colExtra=snap.colExtra??-1;sessionCompleted=!!snap.sessionCompleted;active=false;waitingForResumeKey=true;
   if(sessionCompleted){finishSession();}else{
     loadQuestion();activeMsCurrent=Number(snap.activeMsCurrent)||0;

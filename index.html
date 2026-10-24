@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cheese Learning</title>
 <link rel="icon" href="cheese_icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;900&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
@@ -64,7 +67,7 @@ body{display:block;padding:96px 18px 28px;background:#fcfdfb}.main-container{mar
 .page{max-width:1100px;margin:20px auto}.page[hidden]{display:none!important}.secondary{color:#667085}.sheet{border:1px solid #e5e7eb;background:#fff;border-radius:16px;padding:20px;margin:14px 0}.wide{width:100%}.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.lesson-row{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #edf0ee;padding:14px 2px;gap:12px}.lesson-row:last-child{border:0}.lesson-row button{cursor:pointer}.stack{display:grid;gap:10px}.auth-field{width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:8px;margin:4px 0 12px}.bar{height:9px;display:flex;overflow:hidden;background:#eaecf0;border-radius:8px;min-width:145px}.bar span{height:100%}.lvl-A{background:#178a45}.lvl-B{background:#86c95c}.lvl-C{background:#ffca50}.lvl-D{background:#e77864}.extra-info{color:#667085;font-size:clamp(.95rem,2vw,1.15rem);min-height:20px}.details-toggle{background:#e9f9ed;color:#16803c;border:0;border-radius:50%;padding:10px 15px;cursor:pointer;font-size:1.25rem}.details-panel{margin:15px auto;max-width:780px;transition:.2s}.details-panel[hidden]{display:none}.details-panel .session-stats{max-width:none}.view-muted{opacity:.35}.modal-content{max-height:90vh;overflow:auto}.notice{white-space:pre-wrap;color:#667085;font-size:.85rem}.auth-inline{margin-left:auto;font-size:.85rem}.compact{font-size:.9rem}.danger{color:#b42318}.course-name{font-weight:700}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #8adeab;outline-offset:2px}@media(max-width:720px){.toolbar{position:static;margin:-80px 0 20px}.main-container{margin:10px auto}.page{margin:10px auto}.auth-inline{margin-left:0}.lesson-row{flex-wrap:wrap}}
 
 /* v2.1 minimal visual system */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;900&display=swap');
+
 :root{--green:#4A943E;--red:#D9361E;--ink:#000;--muted:#4A943E;--line:#FBE580;--panel:#FFFDE1;--amber:#FFCB3D}
 body{font-family:Inter,Arial,sans-serif!important;color:#000;background:#fff;padding:102px 28px 30px;min-height:100vh}
 button,input,select{font-family:inherit}button{cursor:pointer}
@@ -76,66 +79,80 @@ button,input,select{font-family:inherit}button{cursor:pointer}
 .main-container.stats-open .progress-wrap,.main-container.stats-open .course-name,.main-container.stats-open .question,.main-container.stats-open .extra-info,.main-container.stats-open .typing-container,.main-container.stats-open .live-grid,.main-container.stats-open .hint,.main-container.stats-open #completion-panel{display:none!important}.main-container.stats-open #details-panel{display:flex!important;align-items:center;justify-content:center;flex:1;width:100%;max-width:1200px;animation:slideUp .28s ease}.main-container.stats-open .details-toggle{order:2;transform:rotate(180deg)}@keyframes slideUp{from{opacity:0;transform:translateY(45px)}to{opacity:1;transform:translateY(0)}}.session-stats{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:22px;max-width:1050px!important}.stat{width:clamp(155px,17vw,240px);aspect-ratio:1;border-radius:50%;background:#FFCB3D;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;gap:10px}.stat:nth-child(2n){background:#FBE580}.stat:nth-child(3n){background:#FFFDE1}.stat-label{font-size:.96rem;color:#000;font-weight:400}.stat-value{font-size:clamp(2rem,3vw,3.2rem);font-weight:900;margin:0}.stat-sub{font-size:.8rem}
 .page{max-width:1140px;margin:30px auto}.page h1{font-size:clamp(1.8rem,3vw,2.6rem);font-weight:500}.course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:20px}.lesson-row{background:#FFFDE1;border:1px solid #FBE580;border-radius:22px;padding:24px;display:grid;gap:15px;cursor:pointer}.lesson-row:hover{border-color:#FFCB3D}.course-name{font-weight:400}.bar{background:#fff;height:15px;border-radius:99px;min-width:180px}.lvl-A{background:#4A943E}.lvl-B{background:#FFCB3D}.lvl-C{background:#FBE580}.lvl-D{background:#D9361E}.icon-btn{border:1px solid #FBE580;border-radius:12px;background:#FFFDE1;color:#000;font-size:1rem;padding:11px 15px}.icon-btn:hover{background:#FBE580}.modal-overlay{z-index:90}.modal-content{width:min(96vw,540px);border-radius:24px;max-height:90vh;overflow:auto}.modal-content h2{font-weight:500}.course-modal{width:min(1100px,96vw)}.course-modal-layout{display:grid;grid-template-columns: minmax(240px,1fr) minmax(270px,1.3fr);gap:24px}.course-modal .metric-pair{display:flex;justify-content:space-between;border-bottom:1px solid #FBE580;padding:10px 2px;gap:14px}.history-row{display:grid;gap:5px;margin:12px 0}.history-title{font-size:.86rem}.modal-actions{margin-top:24px}.form-group label{font-weight:500}.btn-start{background:#4A943E;font-weight:500}.small-note,.secondary,.notice{color:#4A943E}.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 @media(max-width:720px){body{padding:92px 14px 20px}.topbar{height:66px}.sidebar{top:66px}.sidebar-backdrop{inset:66px 0 0}.header-actions{gap:0}.header-icon{font-size:25px}.main-container{min-height:calc(100dvh - 110px)}.typing-container{font-size:clamp(2.1rem,8vw,4.6rem)}.live-grid{grid-template-columns:repeat(2,1fr)}.hint{position:static;align-self:flex-end;order:4;margin:10px 0 4px}.details-toggle{margin:0 auto}.session-stats{gap:12px}.stat{width:clamp(138px,40vw,190px)}.course-modal-layout{grid-template-columns:1fr}.page{margin:8px auto}}
-/* v2.1.1 fixes: predictable typing display, functional settings and more readable dialogs */
-:root{--typing-scale:1}
-#app-area .live-grid{display:none!important}
-#app-area .typing-container{flex-wrap:nowrap;white-space:nowrap;overflow-x:auto;overflow-y:hidden;width:100%;max-width:100%;min-height:clamp(82px,14vh,132px);justify-content:center;gap:clamp(0px,.15vw,3px);padding:8px 12px 16px;scrollbar-width:thin;overscroll-behavior-x:contain}
-#app-area .typing-container.is-overflowing{justify-content:flex-start}
-#app-area .char{flex:0 0 auto;min-width:clamp(15px,3.1vw,46px);font-size:1em}
-#app-area .char.pending::after{color:transparent!important;transition:color .12s ease}
-#app-area .typing-container:hover .char.pending::after{color:#A36B00!important}
-#app-area .extra-info{color:#FFCB3D;font-size:clamp(1rem,1.8vw,1.45rem);font-weight:500;line-height:1.5;margin:10px auto 8px;max-width:1100px;overflow-wrap:anywhere;min-height:0}
-#app-area .question{color:#000;font-size:clamp(1.05rem,1.8vw,1.55rem);font-weight:400;line-height:1.5;margin:8px auto 18px;max-width:1100px;overflow-wrap:anywhere;white-space:pre-wrap}
-#app-area .progress-wrap{margin:10px auto 0}
-#app-area .course-name{margin-top:8px}
-.modal-overlay{padding:clamp(10px,2vw,24px);overscroll-behavior:contain}
-.modal-content{padding:clamp(22px,3vw,36px);line-height:1.6;max-height:calc(100dvh - 32px);width:min(720px,calc(100vw - 32px));overflow:auto}
-.modal-content h2{font-size:clamp(1.35rem,2vw,1.8rem);line-height:1.3;text-align:left;margin:0}
-.modal-heading{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:16px}
-.modal-heading .icon-btn{flex:0 0 auto}
-.modal-content .form-group{margin:18px 0}
-.modal-content .form-group label{display:block;margin-bottom:8px;font-size:1rem;line-height:1.45}
-.modal-content .form-group select,.modal-content .form-group input:not([type=checkbox]):not([type=radio]):not([type=range]){width:100%;min-height:46px;padding:11px 13px;border:1px solid #d0d5dd;border-radius:10px;font-size:1rem;background:#fff}
-.modal-content .actions{gap:14px;row-gap:14px;margin-top:20px}
-.modal-content .icon-btn,.modal-content .btn-start{min-height:46px;padding:12px 18px;line-height:1.35;white-space:normal}
-.settings-modal-content{width:min(860px,calc(100vw - 32px))}
-.settings-columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.settings-columns .form-group{min-width:0}
-.settings-toggles{display:flex;flex-wrap:wrap;gap:16px 26px;margin:8px 0 20px}
-.settings-check{display:flex;align-items:center;gap:9px;font-size:1rem}
-.settings-check input{width:18px;height:18px;accent-color:#4A943E}
-.small-note{font-size:.93rem;line-height:1.6;overflow-wrap:anywhere}
-.font-size-control{padding:16px 18px;border:1px solid #FBE580;border-radius:14px;background:#fffdf2}
-.font-size-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.font-size-heading label{margin:0!important}
-#typing-font-output{font-weight:700;color:#4A943E;font-variant-numeric:tabular-nums}
-#typing-font-scale{width:100%;accent-color:#4A943E;margin:8px 0}
-.range-ends{display:flex;justify-content:space-between;font-size:.85rem;color:#667085}
-.settings-actions{display:flex;gap:14px;margin-top:24px}
-.settings-actions .btn-start{flex:1;width:auto;margin:0}
-.settings-actions .icon-btn{min-width:120px}
-#course-modal .course-modal{width:min(1240px,calc(100vw - 32px));padding:clamp(24px,3vw,42px)}
-#course-modal #course-modal-body{font-size:1rem;line-height:1.7}
-#course-modal .course-modal-layout{grid-template-columns:minmax(260px,.9fr) minmax(320px,1.35fr);gap:clamp(22px,3vw,38px);margin-top:18px}
-#course-modal .metric-pair{padding:13px 4px;gap:18px;font-size:1rem}
-#course-modal .metric-pair span{color:#475467}
-#course-modal .metric-pair strong{font-size:1.05rem;white-space:nowrap}
-#course-modal .history-title{font-size:.98rem;line-height:1.55;overflow-wrap:anywhere}
-#course-modal .history-row{gap:9px;margin:18px 0}
-#course-modal .bar{height:13px;min-width:120px}
-#course-modal .modal-actions{display:flex;gap:14px;row-gap:14px;margin-top:28px}
-#course-modal .modal-actions .icon-btn{flex:1 1 190px}
-#edit-modal .modal-content{width:min(820px,calc(100vw - 32px));padding:clamp(24px,3vw,40px)}
-#edit-modal label{display:block;font-weight:600;line-height:1.55}
-#edit-modal .auth-field{margin:8px 0 18px;min-height:48px;font-size:1rem}
-#edit-modal #edit-file{display:block;width:100%;padding:12px;border:1px dashed #d0d5dd;border-radius:12px;background:#fffdf2;margin:8px 0 18px}
-#edit-modal #edit-preview{font-size:.98rem;line-height:1.7;overflow-wrap:anywhere}
-#edit-modal #edit-preview .stack{max-height:260px;overflow:auto;border:1px solid #f0e3a1;border-radius:12px;padding:12px;background:#fffdf2}
-#edit-modal .actions{gap:16px;row-gap:14px}
-#edit-modal .actions .icon-btn{flex:1 1 180px}
-button:disabled,select:disabled{cursor:not-allowed;opacity:.58}
-@media(max-width:800px){.settings-columns{grid-template-columns:1fr;gap:0}#course-modal .course-modal-layout{grid-template-columns:1fr}}
-@media(max-width:520px){#app-area .typing-container{justify-content:flex-start;min-height:76px;padding-left:4px;padding-right:4px}#app-area .char{min-width:clamp(14px,4.2vw,27px)}.settings-actions{flex-direction:column}.settings-actions .btn-start,.settings-actions .icon-btn{width:100%;flex:auto}.modal-content{padding:22px 18px}.modal-content .actions .icon-btn{flex:1 1 100%}#course-modal .metric-pair{align-items:flex-start}#course-modal .metric-pair span{max-width:65%}}
+
+/* v2.1.1 layout and interaction corrections */
+[hidden]{display:none!important}
+body{background:#fff}
+.main-container{width:min(100%,1320px);margin:0 auto;justify-content:flex-start}
+.progress-wrap{margin:12px auto 0}
+.course-name{margin:18px 0 0}
+.typing-container{width:min(100%,1200px);max-width:100%;min-height:104px;margin:clamp(40px,12vh,130px) auto 20px;padding:10px 4px 12px;display:flex;flex-wrap:nowrap!important;white-space:nowrap;overflow:hidden!important;gap:clamp(1px,.16vw,3px);align-items:center;justify-content:center;font-size:var(--answer-font-size,54px);font-weight:400;letter-spacing:0;line-height:1.32;scrollbar-width:none}
+.typing-container::-webkit-scrollbar{display:none}
+.typing-container .char{flex:0 0 auto;min-width:.68em;width:auto;white-space:pre;text-align:center}
+.typing-container .char.window-hidden{display:none!important}
+/* Prevent accidental pre-reveal. Only hovering directly over the typing area reveals pending characters. */
+.typing-container .char.pending::after{content:none!important;color:transparent!important}
+.typing-container:hover .char.pending::after{content:attr(data-char)!important;color:#FBE580!important}
+.typing-container .char.pending{border-bottom:3px solid #4A943E}
+.extra-info{color:#FFCB3D!important;min-height:0;margin:12px auto 8px;max-width:min(95%,1100px);font-size:clamp(1.08rem,2.3vw,1.7rem);font-weight:500;overflow-wrap:break-word}
+.question{color:#000;min-height:0;margin:8px auto auto;max-width:min(95%,1100px);font-size:clamp(1.25rem,2.8vw,2.25rem);font-weight:500;overflow-wrap:break-word}
+.live-grid{display:none!important}
+.details-toggle{margin:26px auto 22px;flex-shrink:0}
+.main-container.stats-open .typing-container,.main-container.stats-open .extra-info,.main-container.stats-open .question{display:none!important}
+.modal-overlay{padding:clamp(12px,3vw,34px)}
+.modal-content{padding:clamp(22px,3vw,42px);line-height:1.55;font-size:1rem;border-radius:24px;max-height:92dvh;overflow-y:auto;overflow-x:hidden}
+.modal-content h2{font-size:clamp(1.45rem,2.4vw,2rem);line-height:1.3;margin:0 0 24px;text-align:left}
+.course-modal{width:min(1250px,96vw)!important;max-width:none}
+.edit-modal-content{width:min(960px,96vw)!important;max-width:none}
+.settings-modal-content{width:min(730px,95vw)!important;max-width:none}
+.shuffle-modal-content{width:min(790px,95vw)!important;max-width:none}
+.course-modal-layout{grid-template-columns:minmax(260px,.95fr) minmax(360px,1.5fr);gap:clamp(22px,3vw,46px)}
+.course-modal .metric-pair{padding:14px 3px!important;gap:18px;align-items:center;font-size:1rem}
+.course-modal .metric-pair strong{font-size:1.2rem;font-weight:900;white-space:nowrap}
+.course-modal .metric-pair.group-metric span{color:#FFCB3D}
+.course-modal .history-row{margin:18px 0;gap:9px}
+.course-modal .history-title{font-size:1rem;line-height:1.6}
+.course-modal .bar{height:19px}
+.modal-actions{display:flex!important;gap:14px 16px;margin-top:30px;flex-wrap:wrap;align-items:stretch}
+.modal-actions .icon-btn,.modal-actions .btn-start{width:auto!important;min-height:48px;white-space:normal;line-height:1.35;margin:0;padding:12px 18px}
+.modal-actions .btn-start{flex:1 1 185px;max-width:300px}
+.edit-modal-content label{display:block;line-height:1.5;margin-top:16px}
+.edit-modal-content input[type=file]{display:block;width:100%;margin-top:10px;max-width:100%;padding:12px;border-radius:10px;border:1px solid #FBE580}
+.edit-modal-content #edit-preview{margin-top:22px;overflow-wrap:anywhere;line-height:1.65}
+.edit-modal-content #edit-preview .stack{background:#FFFDE1;border-radius:12px;padding:14px 18px;max-height:240px;overflow:auto}
+.modal-section-title{font-size:1.08rem;font-weight:500;margin:24px 0 12px}
+.option-grid,.filter-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.choice-option{display:flex!important;align-items:center;gap:12px;min-height:54px;padding:12px 15px;background:#FFFDE1;border:1px solid #FBE580;border-radius:14px;font-weight:400!important;line-height:1.35;cursor:pointer;margin:0!important}
+.choice-option:has(input:checked){border-color:#FFCB3D;background:#fff5c1}
+.choice-option:has(input:disabled){opacity:.42;cursor:not-allowed}
+.choice-option input[type=checkbox],.choice-option input[type=radio]{flex-shrink:0;width:19px;height:19px;accent-color:#4A943E;margin:0}
+.choice-option .filter-count{margin-left:auto;font-size:.84rem;color:#4A943E}
+.all-choice{grid-column:1/-1}
+.filter-feedback{min-height:22px;font-size:.91rem;color:#4A943E;margin:16px 0 0}
+.settings-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.settings-visibility{margin:18px 0}
+.form-group{margin:12px 0}
+.form-group label{font-weight:500}
+.modal-content input,.modal-content select{font-size:1rem}
+@media(max-width:760px){
+ body{padding:87px 12px 24px}.main-container{min-height:calc(100dvh - 111px)}
+ .typing-container{min-height:85px;margin:clamp(35px,9vh,85px) auto 16px}
+ .course-modal-layout{grid-template-columns:1fr;gap:18px}
+ .modal-content{padding:20px;border-radius:18px}
+ .modal-actions .icon-btn,.modal-actions .btn-start{flex:1 1 160px;max-width:none}
+ .option-grid,.filter-grid{grid-template-columns:1fr}
+ .all-choice{grid-column:auto}
+ .question{margin-bottom:auto}
+ .hint{font-size:.78rem}
+ .topbar{gap:9px;padding:0 11px}
+ .brand{font-size:clamp(1.03rem,4.35vw,1.3rem);white-space:nowrap;letter-spacing:-.04em}
+ .header-icon{font-size:21px;padding:6px 5px}
+ .hamburger{font-size:20px;padding:6px 5px}
+ .header-actions{margin-left:auto;gap:2px}
+}
+.edit-modal-content > button.icon-btn{margin:16px 0 0;min-height:46px}
+.edit-modal-content #confirm-edit:disabled{opacity:.48;cursor:not-allowed}
+
 </style>
 </head>
 <body>
@@ -154,7 +171,7 @@ button:disabled,select:disabled{cursor:not-allowed;opacity:.58}
   <div class="extra-info" id="extra-info"></div>
   <div class="question" id="question-text">Tải file Excel để bắt đầu...</div>
   <input type="text" id="hidden-input" autocomplete="off" autocapitalize="off" spellcheck="false">
-  <div class="live-grid">
+  <div class="live-grid" hidden aria-hidden="true">
     <div class="metric"><div class="metric-label">Thời gian hoạt động</div><div class="metric-value" id="active-time">0,0 giây</div></div>
     <div class="metric"><div class="metric-label">Lượt nhập sai</div><div class="metric-value" id="error-count">0</div></div>
     <div class="metric"><div class="metric-label">Lần sửa</div><div class="metric-value" id="correction-count">0</div></div>
@@ -186,59 +203,50 @@ button:disabled,select:disabled{cursor:not-allowed;opacity:.58}
 <section class="page" id="dashboard-page" hidden><h1>Dashboard</h1><div id="dashboard-body"></div></section>
 <div class="modal-overlay" id="account-modal"><div class="modal-content"><h2>👤 Tài khoản Cheese</h2><p id="account-status" class="secondary"></p><label>Email<input class="auth-field" id="auth-email" type="email" autocomplete="email"></label><label>Mật khẩu<input class="auth-field" id="auth-password" type="password" autocomplete="current-password" minlength="6"></label><div class="actions"><button class="icon-btn" onclick="login()">Đăng nhập</button><button class="icon-btn" onclick="closeAccount()">Đóng</button></div><p class="notice" id="auth-notice"></p></div></div>
 <div class="modal-overlay" id="course-modal"><div class="modal-content course-modal"><div class="actions" style="justify-content:space-between"><h2 id="detail-course-title">Bài học</h2><button class="icon-btn" onclick="closeCourseModal()" aria-label="Đóng">✕</button></div><div id="course-modal-body"></div></div></div>
-<div class="modal-overlay" id="edit-modal"><div class="modal-content"><h2>Chỉnh sửa bài học</h2><label>Tên bài học<input class="auth-field" id="edit-course-name"></label><label>Excel chỉnh sửa<input type="file" accept=".xlsx,.xls" id="edit-file"></label><button class="icon-btn" onclick="previewCourseEdit()">Đọc và đối chiếu</button><div id="edit-preview"></div><div class="actions"><button id="confirm-edit" class="icon-btn" onclick="commitCourseEdit()" disabled>Xác nhận lưu</button><button class="icon-btn" onclick="closeEditModal()">Hủy</button></div></div></div>
-<div class="modal-overlay" id="shuffle-modal"><div class="modal-content"><h2>Bắt đầu phiên mới</h2><div class="form-group"><label><input type="radio" name="shuffle" value="original" checked> Thứ tự gốc</label><label><input type="radio" name="shuffle" value="all"> Trộn toàn bộ từ</label><label><input type="radio" name="shuffle" value="review"> Trộn từ ôn tập tùy chỉnh</label></div><div class="actions" id="review-levels"><label><input type="checkbox" value="A"> A</label><label><input type="checkbox" value="B"> B</label><label><input type="checkbox" value="C" checked> C</label><label><input type="checkbox" value="D" checked> D</label></div><div class="actions"><button class="btn-start" onclick="confirmNewSession()">Bắt đầu</button><button class="icon-btn" onclick="closeShuffle()">Hủy</button></div></div></div>
-<div class="modal-overlay" id="config-modal">
-  <div class="modal-content">
-    <h2>⚙️ Cài đặt bài học</h2>
-    <div class="form-group"><label for="course-title-input">Tên bộ từ vựng</label><input id="course-title-input" type="text" placeholder="Ví dụ: 600 TOEIC Collocation"></div>
-    <div class="form-group"><label for="col-q-select">Chọn cột CÂU HỎI</label><select id="col-q-select"></select></div>
-    <div class="form-group"><label for="col-a-select">Chọn cột TRẢ LỜI</label><select id="col-a-select"></select></div>
-    <div class="form-group"><label for="col-extra-select">Cột THÔNG TIN THÊM (tùy chọn)</label><select id="col-extra-select"><option value="-1">Không hiển thị</option></select></div>
-    <div class="form-group"><label><input type="checkbox" id="show-question" checked> Hiện câu hỏi</label></div>
-    <div class="form-group"><label><input type="checkbox" id="show-extra" checked> Hiện thông tin thêm</label></div>
-    <div class="form-group"><label for="tts-lang-select">Ngôn ngữ phát âm</label><select id="tts-lang-select"><option value="en-US">Tiếng Anh (Mỹ)</option><option value="en-GB">Tiếng Anh (Anh)</option><option value="zh-CN">Tiếng Trung (Giản thể)</option><option value="zh-TW">Tiếng Trung (Phồn thể)</option><option value="vi-VN">Tiếng Việt</option></select></div>
-    <p class="small-note">Thang điểm: 0 lỗi = 100; 1–3 = 80; 4–5 = 60; 6–9 = 40; từ 10 lỗi = 0. Từ chưa hoàn thành không tính điểm.</p>
-    <p class="small-note" id="import-notice">Mỗi lượt nhập tạo bài học mới ở chế độ Cá nhân. Không gộp theo tên file.</p>
-    <button class="btn-start" onclick="startTest()">BẮT ĐẦU KIỂM TRA</button>
+<div class="modal-overlay" id="edit-modal"><div class="modal-content edit-modal-content"><h2>Chỉnh sửa bài học</h2><label>Tên bài học<input class="auth-field" id="edit-course-name"></label><label>Excel chỉnh sửa<input type="file" accept=".xlsx,.xls" id="edit-file"></label><button class="icon-btn" onclick="previewCourseEdit()">Đọc và đối chiếu</button><div id="edit-preview"></div><div class="actions"><button id="confirm-edit" class="icon-btn" onclick="commitCourseEdit()" disabled>Xác nhận lưu</button><button class="icon-btn" onclick="closeEditModal()">Hủy</button></div></div></div>
+<div class="modal-overlay" id="shuffle-modal"><div class="modal-content shuffle-modal-content">
+  <h2>Bắt đầu phiên mới</h2>
+  <div class="modal-section-title">Thứ tự câu hỏi</div>
+  <div class="option-grid" role="radiogroup" aria-label="Thứ tự câu hỏi">
+    <label class="choice-option"><input type="radio" name="shuffle" value="original" checked> Thứ tự gốc</label>
+    <label class="choice-option"><input type="radio" name="shuffle" value="random"> Trộn từ</label>
   </div>
-</div>
-<div class="modal-overlay" id="typing-settings-modal" role="dialog" aria-modal="true" aria-labelledby="typing-settings-title">
+  <div class="modal-section-title">Chọn từ để học</div>
+  <div class="filter-grid" id="review-levels">
+    <label class="choice-option all-choice"><input type="checkbox" id="filter-all" checked onchange="toggleAllFilter()"> Toàn bộ học phần <span id="count-all" class="filter-count"></span></label>
+    <label class="choice-option"><input type="checkbox" value="A" disabled onchange="updateFilterState()"> Nhóm A <span class="filter-count" data-count="A"></span></label>
+    <label class="choice-option"><input type="checkbox" value="B" disabled onchange="updateFilterState()"> Nhóm B <span class="filter-count" data-count="B"></span></label>
+    <label class="choice-option"><input type="checkbox" value="C" disabled onchange="updateFilterState()"> Nhóm C <span class="filter-count" data-count="C"></span></label>
+    <label class="choice-option"><input type="checkbox" value="D" disabled onchange="updateFilterState()"> Nhóm D <span class="filter-count" data-count="D"></span></label>
+    <label class="choice-option"><input type="checkbox" value="unlearned" disabled onchange="updateFilterState()"> Từ chưa học <span class="filter-count" data-count="unlearned"></span></label>
+  </div>
+  <p class="filter-feedback" id="filter-feedback" aria-live="polite"></p>
+  <div class="actions modal-actions"><button class="btn-start" id="confirm-shuffle" onclick="confirmNewSession()">Bắt đầu</button><button class="icon-btn" onclick="closeShuffle()">Hủy</button></div>
+</div></div>
+<div class="modal-overlay" id="config-modal">
   <div class="modal-content settings-modal-content">
-    <div class="modal-heading">
-      <h2 id="typing-settings-title">⚙️ Cài đặt màn hình gõ</h2>
-      <button class="icon-btn" type="button" onclick="closeTypingSettings()" aria-label="Đóng cài đặt">✕</button>
+    <h2>⚙ Cài đặt</h2>
+    <div id="import-settings">
+      <div class="form-group"><label for="course-title-input">Tên bộ từ vựng</label><input id="course-title-input" type="text" placeholder="Tên bài học"></div>
+      <div class="settings-columns">
+        <div class="form-group"><label for="col-q-select">Cột câu hỏi</label><select id="col-q-select"></select></div>
+        <div class="form-group"><label for="col-a-select">Cột trả lời</label><select id="col-a-select"></select></div>
+        <div class="form-group"><label for="col-extra-select">Cột thông tin phụ</label><select id="col-extra-select"><option value="-1">Không hiển thị</option></select></div>
+      </div>
     </div>
-    <p class="small-note" id="column-settings-note">Cột được lấy từ file Excel của phiên hiện tại.</p>
+    <p class="small-note" id="settings-mode-note" hidden>Trong phiên đang học, các cột câu hỏi và đáp án được giữ nguyên để bảo toàn kết quả.</p>
+    <div class="option-grid settings-visibility">
+      <label class="choice-option"><input type="checkbox" id="show-question" checked> Hiện câu hỏi</label>
+      <label class="choice-option"><input type="checkbox" id="show-extra" checked> Hiện thông tin phụ</label>
+    </div>
     <div class="settings-columns">
-      <div class="form-group"><label for="settings-col-q">Cột câu hỏi</label><select id="settings-col-q"></select></div>
-      <div class="form-group"><label for="settings-col-a">Cột câu trả lời</label><select id="settings-col-a"></select></div>
-      <div class="form-group"><label for="settings-col-extra">Cột thông tin bổ sung</label><select id="settings-col-extra"><option value="-1">Không dùng cột bổ sung</option></select></div>
+      <div class="form-group"><label for="tts-lang-select">Ngôn ngữ</label><select id="tts-lang-select" onchange="refreshVoiceOptions()"><option value="en-US">Tiếng Anh (Mỹ)</option><option value="en-GB">Tiếng Anh (Anh)</option><option value="zh-CN">Tiếng Trung (Giản thể)</option><option value="zh-TW">Tiếng Trung (Phồn thể)</option><option value="vi-VN">Tiếng Việt</option></select></div>
+      <div class="form-group"><label for="tts-voice-select">Giọng đọc</label><select id="tts-voice-select"><option value="">Tự động</option></select></div>
     </div>
-    <div class="settings-toggles">
-      <label class="settings-check"><input type="checkbox" id="settings-show-question"> Hiển thị câu hỏi</label>
-      <label class="settings-check"><input type="checkbox" id="settings-show-extra"> Hiển thị thông tin bổ sung</label>
-    </div>
-    <div class="form-group">
-      <label for="settings-tts-lang">Ngôn ngữ phát âm mặc định</label>
-      <select id="settings-tts-lang">
-        <option value="en-US">Tiếng Anh (Mỹ)</option><option value="en-GB">Tiếng Anh (Anh)</option>
-        <option value="zh-CN">Tiếng Trung (Giản thể)</option><option value="zh-TW">Tiếng Trung (Phồn thể)</option><option value="vi-VN">Tiếng Việt</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="settings-tts-voice">Giọng đọc câu trả lời</label>
-      <select id="settings-tts-voice"><option value="">Mặc định theo ngôn ngữ</option></select>
-      <p class="small-note" id="voice-settings-note">Danh sách giọng đọc phụ thuộc vào trình duyệt và giọng đã cài trên thiết bị.</p>
-    </div>
-    <div class="form-group font-size-control">
-      <div class="font-size-heading"><label for="typing-font-scale">Cỡ chữ từ vựng</label><output id="typing-font-output" for="typing-font-scale">100%</output></div>
-      <input id="typing-font-scale" type="range" min="60" max="140" step="5" value="100">
-      <div class="range-ends"><span>Nhỏ</span><span>Lớn</span></div>
-    </div>
-    <div class="actions settings-actions">
-      <button class="btn-start" type="button" onclick="applyTypingSettings()">Áp dụng</button>
-      <button class="icon-btn" type="button" onclick="closeTypingSettings()">Hủy</button>
+    <div class="actions modal-actions">
+      <button class="btn-start" id="start-test-button" onclick="startTest()">Bắt đầu học</button>
+      <button class="btn-start" id="save-settings-button" onclick="applyCurrentSettings()" hidden>Lưu cài đặt</button>
+      <button class="icon-btn" onclick="closeSettings()">Đóng</button>
     </div>
   </div>
 </div>
@@ -253,6 +261,9 @@ let testData = [];
 let currentIndex = 0;
 let targetWord = '';
 let ttsLang = 'en-US';
+let ttsVoiceURI = '';
+let pendingImport = false;
+let fitPending = false;
 let courseName = '';
 let active = false;
 let waitingForResumeKey = false;
@@ -267,7 +278,6 @@ let sessionCompleted = false;
 let saveTimer = null;
 let courseId = null, sessionId = null, cloudRevision = 0, syncBusy = false, syncRequested = false;
 let colExtra=-1, showQuestion=true, showExtra=true;
-let fontScale=100, ttsVoiceURI='', activeColumns={q:null,a:null,extra:-1};
 let cloudClient=null, cloudUser=null, suspendCloudSync=false;
 let lastActivityMs=0;
 
@@ -362,7 +372,8 @@ $('file-upload').addEventListener('change', e => {
       $('course-title-input').value = courseName;
       populateColumnSelects(globalRawData[0]);
       $('completion-panel').style.display = 'none';
-      configModal.style.display = 'flex';
+      pendingImport = true;
+      showSettingsModal(true);
     } catch(err) { alert('Không đọc được file. Hãy kiểm tra định dạng Excel.'); console.error(err); }
   };
   reader.readAsArrayBuffer(file);
@@ -378,120 +389,63 @@ function populateColumnSelects(headers){
   });
   if(headers.length > 1) a.selectedIndex = 1;
 }
-function openSettings(){
-  const q=$('settings-col-q'), a=$('settings-col-a'), x=$('settings-col-extra');
-  q.replaceChildren();a.replaceChildren();x.replaceChildren();x.add(new Option('Không dùng cột bổ sung',-1));
-  const hasRaw=globalRawData.length>1 && Array.isArray(globalRawData[0]);
-  if(hasRaw){
-    globalRawData[0].forEach((header,index)=>{
-      const label=String(header??'').trim()||`Cột ${index+1}`;
-      q.add(new Option(label,index));a.add(new Option(label,index));x.add(new Option(label,index));
-    });
-    q.disabled=false;a.disabled=false;x.disabled=false;
-    q.value=String(activeColumns.q ?? $('col-q-select').value ?? 0);
-    a.value=String(activeColumns.a ?? $('col-a-select').value ?? Math.min(1,globalRawData[0].length-1));
-    x.value=String(activeColumns.extra ?? colExtra);
-    $('column-settings-note').textContent='Đổi cột sẽ tạo lại danh sách từ. Tiến độ hiện tại sẽ được lưu trước khi đổi; nếu đang đăng nhập, bài học cũ được giữ và một bài học mới được tạo.';
-  }else{
-    q.add(new Option('Không có dữ liệu cột gốc — tải lại Excel để đổi',-1));
-    a.add(new Option('Không có dữ liệu cột gốc — tải lại Excel để đổi',-1));
-    q.value='-1';a.value='-1';q.disabled=true;a.disabled=true;x.disabled=true;
-    $('column-settings-note').textContent='Phiên hiện tại không còn dữ liệu Excel gốc. Các lựa chọn cột bị khóa để tránh thay đổi nhầm dữ liệu; hãy tải lại file Excel nếu cần đổi ánh xạ cột.';
-  }
-  $('settings-show-question').checked=showQuestion;
-  $('settings-show-extra').checked=showExtra;
-  $('settings-tts-lang').value=ttsLang||'en-US';
-  $('typing-font-scale').value=String(fontScale);
-  $('typing-font-output').textContent=`${fontScale}%`;
-  populateVoiceOptions();
-  $('settings-tts-voice').value=ttsVoiceURI;
-  applyTypingScale(fontScale);
-  $('typing-settings-modal').style.display='flex';
-}
-function closeTypingSettings(){
-  $('typing-settings-modal').style.display='none';
-  applyTypingScale(fontScale);
-}
-function applyTypingScale(value=fontScale){
-  const scale=Math.max(60,Math.min(140,Number(value)||100))/100;
-  const baseMin=(window.matchMedia('(max-width: 720px)').matches?1.2:1.45)*scale;
-  const fluid=(window.matchMedia('(max-width: 720px)').matches?8:7.2)*scale;
-  const max=(window.matchMedia('(max-width: 720px)').matches?3.8:5.2)*scale;
-  displayArea.style.fontSize=`clamp(${baseMin}rem, ${fluid}vw, ${max}rem)`;
-  displayArea.style.letterSpacing=`clamp(${0.5*scale}px, ${0.4*scale}vw, ${5*scale}px)`;
-}
-function previewTypingScale(value){
-  $('typing-font-output').textContent=`${value}%`;
-  applyTypingScale(value);
-}
-function populateVoiceOptions(){
-  const select=$('settings-tts-voice');
-  const chosen=ttsVoiceURI||select.value;
+function refreshVoiceOptions(){
+  const el=$('tts-voice-select');
+  const wanted=el.value||ttsVoiceURI;
+  const lang=$('tts-lang-select').value.toLowerCase();
   const voices=('speechSynthesis' in window)?window.speechSynthesis.getVoices():[];
-  select.replaceChildren(new Option('Mặc định theo ngôn ngữ',''));
-  voices.slice().sort((a,b)=>`${a.lang} ${a.name}`.localeCompare(`${b.lang} ${b.name}`)).forEach(voice=>{
-    const label=`${voice.name} (${voice.lang})${voice.default?' · mặc định':''}`;
-    select.add(new Option(label,voice.voiceURI||voice.name));
-  });
-  select.disabled=voices.length===0;
-  $('voice-settings-note').textContent=voices.length?'Chọn một giọng có sẵn trên thiết bị. Nếu giọng đã chọn không còn khả dụng, hệ thống sẽ dùng giọng mặc định theo ngôn ngữ.':'Trình duyệt chưa cung cấp danh sách giọng đọc; có thể chọn ngôn ngữ phát âm mặc định.';
-  if([...select.options].some(option=>option.value===chosen))select.value=chosen;
+  el.replaceChildren(new Option('Tự động', ''));
+  for(const voice of voices.filter(v=>v.lang.toLowerCase().startsWith(lang.slice(0,2)))){
+    el.add(new Option(`${voice.name} (${voice.lang})`,voice.voiceURI));
+  }
+  el.value=[...el.options].some(o=>o.value===wanted)?wanted:'';
 }
-async function flushCurrentCloudStateBeforeReset(){
-  if(!cloudUser||!sessionId)return;
-  pauseClock('Đang lưu phiên trước khi đổi cột');
-  if(saveTimer){clearTimeout(saveTimer);saveTimer=null;}
+if('speechSynthesis' in window){window.speechSynthesis.addEventListener?.('voiceschanged',()=>{
+  if(configModal.style.display==='flex')refreshVoiceOptions();
+});}
+function showSettingsModal(importMode){
+  pauseClock('Cài đặt bài học');
+  $('import-settings').hidden=!importMode;
+  $('settings-mode-note').hidden=!!importMode;
+  $('start-test-button').hidden=!importMode;
+  $('save-settings-button').hidden=!!importMode;
+  $('show-question').checked=showQuestion;
+  $('show-extra').checked=showExtra;
+  $('tts-lang-select').value=ttsLang;
+  $('tts-voice-select').value=ttsVoiceURI;
+  refreshVoiceOptions();
+  configModal.style.display='flex';
+}
+function openSettings(){
+  if(pendingImport && globalRawData.length){showSettingsModal(true);return;}
+  if(testData.length){showSettingsModal(false);return;}
+  alert('Hãy tải file Excel trước khi cài đặt bài học.');
+}
+function closeSettings(){configModal.style.display='none';pendingImport=false;}
+function applyCurrentSettings(){
+  if(!testData.length){closeSettings();return;}
+  ttsLang=$('tts-lang-select').value;
+  ttsVoiceURI=$('tts-voice-select').value;
+  showQuestion=$('show-question').checked;
+  showExtra=$('show-extra').checked;
+  configModal.style.display='none';
+  refreshCurrentPrompt();
   saveProgress(false);
-  if(saveTimer){clearTimeout(saveTimer);saveTimer=null;}
-  for(let i=0;syncBusy&&i<100;i++) await new Promise(resolve=>setTimeout(resolve,100));
-  if(syncBusy)throw new Error('Đồng bộ đang bận. Hãy thử áp dụng lại sau khi trạng thái đồng bộ hoàn tất.');
-  if(saveTimer){clearTimeout(saveTimer);saveTimer=null;}
-  if(lastSnapshot)await flushCloudSave();
-  if(lastSnapshot)throw new Error('Chưa lưu được tiến độ hiện tại; không đổi cột để tránh mất dữ liệu. Kiểm tra kết nối rồi thử lại.');
 }
-async function applyTypingSettings(){
-  const hasRaw=globalRawData.length>1 && Array.isArray(globalRawData[0]);
-  const nextColumns=hasRaw?{q:Number($('settings-col-q').value),a:Number($('settings-col-a').value),extra:Number($('settings-col-extra').value)}:activeColumns;
-  const columnsChanged=hasRaw&&(nextColumns.q!==activeColumns.q||nextColumns.a!==activeColumns.a||nextColumns.extra!==activeColumns.extra);
-  if(columnsChanged&&(nextColumns.q<0||nextColumns.a<0)){alert('Hãy chọn cột câu hỏi và câu trả lời hợp lệ.');return;}
-  if(columnsChanged&&testData.length){
-    const accepted=confirm('Thay đổi cột sẽ tạo lại danh sách từ và đặt lại tiến độ của phiên hiện tại. Bài học cũ trên tài khoản sẽ được giữ, đồng thời tạo một bài học mới. Tiếp tục?');
-    if(!accepted)return;
-    try{await flushCurrentCloudStateBeforeReset();}catch(error){alert(error.message);return;}
-  }
-  showQuestion=$('settings-show-question').checked;
-  showExtra=$('settings-show-extra').checked;
-  ttsLang=$('settings-tts-lang').value||'en-US';
-  ttsVoiceURI=$('settings-tts-voice').value||'';
-  fontScale=Number($('typing-font-scale').value)||100;
-  applyTypingScale(fontScale);
-  if(columnsChanged){
-    $('col-q-select').value=String(nextColumns.q);$('col-a-select').value=String(nextColumns.a);$('col-extra-select').value=String(nextColumns.extra);
-    $('show-question').checked=showQuestion;$('show-extra').checked=showExtra;$('tts-lang-select').value=ttsLang;
-    $('course-title-input').value=courseName||$('course-title-input').value;
-    closeTypingSettings();startTest();return;
-  }
-  if(testData.length&&currentIndex<testData.length){
-    const item=testData[currentIndex];
-    questionText.textContent=showQuestion?item.Q:'';
-    $('extra-info').textContent=showExtra?(item.Extra||''):'';
-  }
-  closeTypingSettings();
-  saveProgress(false);
-  if(cloudUser&&courseId&&cloudClient){
-    const {error}=await cloudClient.from('courses').update({settings:{ttsLang,ttsVoiceURI,showQuestion,showExtra,colExtra,fontScale}}).eq('id',courseId);
-    if(error)setStatus('Cài đặt áp dụng trong phiên này; chưa lưu được cài đặt cho bài học',true);
-  }
+function refreshCurrentPrompt(){
+  if(currentIndex>=testData.length)return;
+  const word=testData[currentIndex];
+  questionText.textContent=showQuestion?word.Q:'';
+  $('extra-info').textContent=showExtra?(word.Extra||''):'';
 }
-if('speechSynthesis' in window)window.speechSynthesis.addEventListener?.('voiceschanged',populateVoiceOptions);
-$('typing-font-scale').addEventListener('input',event=>previewTypingScale(event.target.value));
+
 function startTest(){
   const qIdx = Number.parseInt($('col-q-select').value,10);
   const aIdx = Number.parseInt($('col-a-select').value,10);
   if(qIdx === aIdx){ if(!confirm('Bạn đang chọn cùng một cột cho câu hỏi và đáp án. Vẫn tiếp tục?')) return; }
-  activeColumns={q:qIdx,a:aIdx,extra:Number($('col-extra-select').value)};
   ttsLang = $('tts-lang-select').value;
-  colExtra=activeColumns.extra;showQuestion=$('show-question').checked;showExtra=$('show-extra').checked;
+  ttsVoiceURI = $('tts-voice-select').value;
+  colExtra=Number($('col-extra-select').value);showQuestion=$('show-question').checked;showExtra=$('show-extra').checked;
   courseName = $('course-title-input').value.trim() || 'Vocabulary';
   testData = [];
   for(let i=1;i<globalRawData.length;i++){
@@ -509,8 +463,7 @@ function startTest(){
   if(!testData.length){alert('Không có dòng nào có đủ câu hỏi và đáp án.');return;}
   currentIndex=0; sessionCompleted=false; active=false; waitingForResumeKey=false;
   courseId=null;sessionId=null;cloudRevision=0;
-  configModal.style.display='none';
-  applyTypingScale(fontScale);
+  configModal.style.display='none';pendingImport=false;
   resetCurrentWord(); loadQuestion(); updateSessionStats(); saveProgress(false);
   hiddenInput.focus({preventScroll:true});
   if(cloudUser) createCloudCourseAndSession();
@@ -520,10 +473,8 @@ function playPronunciation(){
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(targetWord);
   utterance.lang=ttsLang;
-  if(ttsVoiceURI){
-    const voice=window.speechSynthesis.getVoices().find(item=>item.voiceURI===ttsVoiceURI||item.name===ttsVoiceURI);
-    if(voice){utterance.voice=voice;utterance.lang=voice.lang||ttsLang;}
-  }
+  const voice=window.speechSynthesis.getVoices().find(v=>v.voiceURI===ttsVoiceURI);
+  if(voice)utterance.voice=voice;
   window.speechSynthesis.speak(utterance);
 }
 function resetCurrentWord(){
@@ -536,8 +487,7 @@ function resetCurrentWord(){
 function loadQuestion(){
   if(currentIndex>=testData.length){finishSession();return;}
   const item=testData[currentIndex];
-  targetWord=item.A; questionText.textContent=showQuestion?item.Q:'';
-  $('extra-info').textContent=showExtra?(item.Extra||''):'';
+  targetWord=item.A; refreshCurrentPrompt();
   $('course-name').textContent=courseName;
   $('completion-panel').style.display='none';
   resetCurrentWord();
@@ -549,8 +499,7 @@ function loadQuestion(){
     else {span.textContent='_';span.className='char pending';}
     displayArea.appendChild(span);
   }
-  applyTypingScale(fontScale);
-  requestAnimationFrame(updateTypingOverflow);
+  scheduleFitAnswer();
   playPronunciation();
   if(document.hidden || !document.hasFocus()){
     waitingForResumeKey=true;setStatus('Nhấn phím để bắt đầu',true);
@@ -559,11 +508,6 @@ function loadQuestion(){
   }
   updateProgress();updateSessionStats();updateLiveMetrics();
 }
-function updateTypingOverflow(){
-  const overflowing=displayArea.scrollWidth>displayArea.clientWidth+2;
-  displayArea.classList.toggle('is-overflowing',overflowing);
-}
-window.addEventListener('resize',()=>{applyTypingScale(fontScale);requestAnimationFrame(updateTypingOverflow);});
 function normalizeChar(ch){return ch.toLocaleLowerCase();}
 function countWrongPositions(text){
   let count=0;
@@ -585,7 +529,40 @@ function updateDisplay(text){
       spans[i].textContent=targetWord[i]===' '?'\\u00a0':'_';spans[i].className='char pending';
     }
   }
+  scheduleFitAnswer();
 }
+function scheduleFitAnswer(){
+  if(fitPending)return;
+  fitPending=true;
+  requestAnimationFrame(()=>{fitPending=false;fitAnswerToLine();});
+}
+function fitAnswerToLine(){
+  if(!targetWord.length||!displayArea.clientWidth)return;
+  const spans=[...displayArea.querySelectorAll('.char')];
+  if(!spans.length)return;
+  spans.forEach(span=>span.classList.remove('window-hidden'));
+  // Reduce font size first. Only if a long entry still cannot fit at 16 px
+  // do we display a moving window of characters around the typing cursor.
+  const preferred=Math.max(32,Math.min(88,window.innerWidth*0.074));
+  let low=16,high=preferred;
+  for(let i=0;i<11;i++){
+    const mid=(low+high)/2;
+    displayArea.style.setProperty('--answer-font-size',mid.toFixed(2)+'px');
+    if(displayArea.scrollWidth>displayArea.clientWidth+1)high=mid;else low=mid;
+  }
+  displayArea.style.setProperty('--answer-font-size',low.toFixed(2)+'px');
+  if(displayArea.scrollWidth>displayArea.clientWidth+1){
+    displayArea.style.setProperty('--answer-font-size','16px');
+    const sample=spans[0].getBoundingClientRect().width||12;
+    const n=Math.max(2,Math.floor((displayArea.clientWidth-16)/(sample+3)));
+    const current=hiddenInput.value.length;
+    const start=Math.max(0,Math.min(current-Math.floor(n*.6),spans.length-n));
+    spans.forEach((span,i)=>span.classList.toggle('window-hidden',i<start||i>=start+n));
+  }
+}
+window.addEventListener('resize',scheduleFitAnswer);
+if('ResizeObserver' in window)new ResizeObserver(scheduleFitAnswer).observe(displayArea);
+if(document.fonts?.ready)document.fonts.ready.then(scheduleFitAnswer);
 hiddenInput.addEventListener('beforeinput', () => { if(!active && !waitingForResumeKey) startClock(); });
 hiddenInput.addEventListener('input', e => {
   if(currentIndex>=testData.length || sessionCompleted) return;
@@ -705,7 +682,7 @@ function finishSession(){
 function saveProgress(showAlert=false){
   if(!testData.length)return;
   const payload={
-    version:2,testData,currentIndex,ttsLang,ttsVoiceURI,fontScale,activeColumns,courseName,sessionCompleted,colExtra,showQuestion,showExtra,courseId,sessionId,
+    version:2,testData,currentIndex,ttsLang,ttsVoiceURI,courseName,sessionCompleted,colExtra,showQuestion,showExtra,courseId,sessionId,
     currentInput:hiddenInput.value,
     activeMsCurrent:elapsedActiveMs(),
     errorCountCurrent,correctionCountCurrent,
@@ -726,9 +703,8 @@ function restoreProgress(){
     if(!saved.testData?.length)return;
     if(!confirm(`Tìm thấy tiến trình "${saved.courseName||'Vocabulary'}" đã lưu. Bạn muốn tiếp tục?`))return;
     testData=saved.testData;currentIndex=Math.min(saved.currentIndex||0,testData.length);
-    ttsLang=saved.ttsLang||'en-US';ttsVoiceURI=saved.ttsVoiceURI||'';fontScale=Number(saved.fontScale)||100;activeColumns=saved.activeColumns||activeColumns;
-    courseName=saved.courseName||'Vocabulary';sessionCompleted=!!saved.sessionCompleted;
-    showQuestion=saved.showQuestion!==false;showExtra=saved.showExtra!==false;colExtra=saved.colExtra??-1;applyTypingScale(fontScale);
+    ttsLang=saved.ttsLang||'en-US';ttsVoiceURI=saved.ttsVoiceURI||'';courseName=saved.courseName||'Vocabulary';sessionCompleted=!!saved.sessionCompleted;
+    showQuestion=saved.showQuestion!==false;showExtra=saved.showExtra!==false;colExtra=saved.colExtra??-1;
     $('course-name').textContent=courseName;
     if(sessionCompleted){finishSession();return;}
     loadQuestion();
@@ -810,8 +786,9 @@ document.body.addEventListener('click',e=>{
     hiddenInput.focus({preventScroll:true});
   }
 });
-window.addEventListener('load',()=>{populateVoiceOptions();initializeApp();});
+window.addEventListener('load',()=>{if(typeof initializeApp==='function')initializeApp();else restoreProgress();});
 </script>
+<script src="study-logic.js"></script>
 <script src="cloud.js"></script>
 </body>
 </html>
