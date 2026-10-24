@@ -153,6 +153,21 @@ body{background:#fff}
 .edit-modal-content > button.icon-btn{margin:16px 0 0;min-height:46px}
 .edit-modal-content #confirm-edit:disabled{opacity:.48;cursor:not-allowed}
 
+/* v2.2 typing screen: minimalist, modelled on index1.2.3 */
+html,body{overflow-x:hidden}
+.main-container .course-name,.main-container .progress-wrap{display:none!important}
+.question{order:1;margin:auto auto 26px!important;width:100%;max-width:min(96%,1500px);text-align:center;font-weight:700;color:#000;white-space:nowrap;overflow:visible}
+.extra-info{order:2;margin:0 auto 22px!important;width:100%;max-width:min(96%,1500px);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:0}
+.typing-container{order:3;width:100%!important;max-width:100%!important;min-height:0!important;margin:0 auto auto!important;padding:8px 0 12px!important;gap:0!important;display:flex;flex-wrap:nowrap!important;justify-content:center;align-items:center;overflow:visible!important;font-size:var(--answer-font-size,56px);font-weight:700;letter-spacing:0;line-height:1.25;cursor:text}
+.typing-container .char{flex:0 0 auto;width:.66em;min-width:0!important;margin:0 .07em;text-align:center;white-space:pre}
+.typing-container .char.correct{color:#4caf50}
+.typing-container .char.incorrect{color:#f44336;background:#ffebee;border-radius:4px}
+.typing-container .char.pending{color:transparent;border-bottom:4px solid #ccc}
+.typing-container:hover .char.pending::after{color:#e0e0e0!important}
+.details-toggle{order:4;margin:14px auto 22px}
+#completion-panel{order:3}
+@media(max-width:760px){.question{margin:auto auto 18px!important}.typing-container{margin:0 auto auto!important}}
+
 </style>
 </head>
 <body>
@@ -437,7 +452,21 @@ function refreshCurrentPrompt(){
   const word=testData[currentIndex];
   questionText.textContent=showQuestion?word.Q:'';
   $('extra-info').textContent=showExtra?(word.Extra||''):'';
+  fitQuestion();
 }
+function fitQuestion(){
+  const el=questionText;
+  if(!el||!el.textContent)return;
+  el.style.whiteSpace='nowrap';
+  let high=Math.min(40,Math.max(22,window.innerWidth*0.032)),low=14;
+  el.style.fontSize=high+'px';
+  if(el.scrollWidth<=el.clientWidth+1)return;
+  for(let i=0;i<10;i++){const mid=(low+high)/2;el.style.fontSize=mid+'px';if(el.scrollWidth>el.clientWidth+1)high=mid;else low=mid;}
+  el.style.fontSize=low+'px';
+  if(el.scrollWidth>el.clientWidth+1)el.style.whiteSpace='normal';
+}
+window.addEventListener('resize',fitQuestion);
+new MutationObserver(fitQuestion).observe(questionText,{childList:true,characterData:true,subtree:true});
 
 function startTest(){
   const qIdx = Number.parseInt($('col-q-select').value,10);
@@ -526,7 +555,7 @@ function updateDisplay(text){
         spans[i].textContent=text[i]===' '?'_':text[i];spans[i].className='char incorrect';
       }
     }else{
-      spans[i].textContent=targetWord[i]===' '?'\\u00a0':'_';spans[i].className='char pending';
+      spans[i].textContent=targetWord[i]===' '?'\u00a0':'_';spans[i].className='char pending';
     }
   }
   scheduleFitAnswer();
@@ -543,7 +572,7 @@ function fitAnswerToLine(){
   spans.forEach(span=>span.classList.remove('window-hidden'));
   // Reduce font size first. Only if a long entry still cannot fit at 16 px
   // do we display a moving window of characters around the typing cursor.
-  const preferred=Math.max(32,Math.min(88,window.innerWidth*0.074));
+  const preferred=Math.max(28,Math.min(64,window.innerWidth*0.06));
   let low=16,high=preferred;
   for(let i=0;i<11;i++){
     const mid=(low+high)/2;
